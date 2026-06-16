@@ -1,0 +1,7 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Obsidian (vault設定は親Vault側で管理。このリポジトリには含めない)
+.obsidian/
+.trash/

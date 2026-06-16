@@ -1,0 +1,144 @@
+filters:
+  and:
+    - 'type == "training-session"'
+    - file.inFolder("20-Areas/health/training-log/sessions")
+    - 'file.basename != "_template-session"'
+    - 'file.basename != "README"'
+
+formulas:
+  status_icon: 'if(status == "completed", "✅ 完了", if(status == "partial", "🟠 部分", if(status == "skipped", "⏭ skip", "❓")))'
+  routine_icon: 'if(routine == "上半身push", "💪 push", if(routine == "脚＋体幹", "🦵 脚＋体幹", if(routine == "Pull＋仕上げ", "🔙 pull", routine)))'
+  condition_label: 'if(condition >= 4, "🟢 " + condition.toString(), if(condition >= 3, "🟡 " + condition.toString(), "🔴 " + condition.toString()))'
+  mood_label: 'if(mood >= 4, "🟢 " + mood.toString(), if(mood >= 3, "🟡 " + mood.toString(), "🔴 " + mood.toString()))'
+  year_month: 'if(date, date.format("YYYY-MM"), "")'
+  days_ago: 'if(date, (today() - date).days, "")'
+
+properties:
+  date:
+    displayName: "実施日"
+  weekday:
+    displayName: "曜日"
+  routine:
+    displayName: "ルーティン"
+  duration_min:
+    displayName: "時間(分)"
+  condition:
+    displayName: "体調"
+  mood:
+    displayName: "気分"
+  total_volume_kg:
+    displayName: "総ボリューム(kg)"
+  status:
+    displayName: "状態"
+  formula.status_icon:
+    displayName: "状態"
+  formula.routine_icon:
+    displayName: "ルーティン"
+  formula.condition_label:
+    displayName: "体調"
+  formula.mood_label:
+    displayName: "気分"
+  formula.year_month:
+    displayName: "月"
+  formula.days_ago:
+    displayName: "何日前"
+
+views:
+  - type: table
+    name: "直近4週の完了率"
+    filters:
+      and:
+        - 'date >= (today() - "28d")'
+    groupBy:
+      property: routine
+      direction: ASC
+    order:
+      - file.name
+      - date
+      - weekday
+      - formula.routine_icon
+      - formula.status_icon
+      - duration_min
+      - total_volume_kg
+      - formula.days_ago
+    summaries:
+      duration_min: Average
+      total_volume_kg: Average
+      condition: Average
+
+  - type: table
+    name: "月次サマリ"
+    groupBy:
+      property: formula.year_month
+      direction: DESC
+    order:
+      - file.name
+      - date
+      - formula.routine_icon
+      - duration_min
+      - total_volume_kg
+      - formula.condition_label
+      - formula.mood_label
+      - formula.status_icon
+    summaries:
+      duration_min: Average
+      total_volume_kg: Sum
+      condition: Average
+      mood: Average
+
+  - type: table
+    name: "ルーティン別"
+    groupBy:
+      property: routine
+      direction: ASC
+    order:
+      - file.name
+      - date
+      - weekday
+      - duration_min
+      - total_volume_kg
+      - formula.condition_label
+      - formula.status_icon
+    summaries:
+      duration_min: Average
+      total_volume_kg: Average
+
+  - type: table
+    name: "直近2週の活動（未記録チェック）"
+    filters:
+      and:
+        - 'date >= (today() - "14d")'
+    order:
+      - date
+      - weekday
+      - file.name
+      - formula.routine_icon
+      - formula.status_icon
+      - formula.days_ago
+
+  - type: table
+    name: "スキップ・部分実施"
+    filters:
+      or:
+        - 'status == "skipped"'
+        - 'status == "partial"'
+    order:
+      - file.name
+      - date
+      - weekday
+      - formula.routine_icon
+      - formula.status_icon
+      - duration_min
+
+  - type: table
+    name: "全件テーブル"
+    order:
+      - file.name
+      - date
+      - weekday
+      - routine
+      - duration_min
+      - condition
+      - mood
+      - total_volume_kg
+      - status

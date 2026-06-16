@@ -1,0 +1,85 @@
+filters:
+  and:
+    - 'type == "training-exercise"'
+    - file.inFolder("20-Areas/health/training-log/exercises")
+    - 'file.basename != "_template-exercise"'
+    - 'file.basename != "README"'
+
+formulas:
+  pr_label: 'if(pr_weight > 0, pr_weight.toString() + "kg × " + pr_reps.toString() + "回", "未測定")'
+  days_since_pr: 'if(pr_date, (today() - pr_date).days, "")'
+  routine_icon: 'if(default_routine == "火", "💪 火", if(default_routine == "木", "🦵 木", if(default_routine == "土", "🔙 土", default_routine)))'
+
+properties:
+  exercise_name:
+    displayName: "種目名"
+  body_part:
+    displayName: "部位"
+  secondary:
+    displayName: "補助筋"
+  default_routine:
+    displayName: "ルーティン日"
+  pr_weight:
+    displayName: "PR重量(kg)"
+  pr_reps:
+    displayName: "PR回数"
+  pr_date:
+    displayName: "PR達成日"
+  formula.pr_label:
+    displayName: "ベスト記録"
+  formula.days_since_pr:
+    displayName: "PRから何日"
+  formula.routine_icon:
+    displayName: "ルーティン日"
+
+views:
+  - type: table
+    name: "PR一覧（部位別）"
+    groupBy:
+      property: body_part
+      direction: ASC
+    order:
+      - file.name
+      - exercise_name
+      - formula.pr_label
+      - pr_weight
+      - pr_reps
+      - pr_date
+      - formula.routine_icon
+    summaries:
+      pr_weight: Max
+
+  - type: table
+    name: "最近更新"
+    order:
+      - file.name
+      - exercise_name
+      - body_part
+      - formula.pr_label
+      - pr_date
+      - formula.days_since_pr
+      - formula.routine_icon
+
+  - type: table
+    name: "ルーティン別"
+    groupBy:
+      property: default_routine
+      direction: ASC
+    order:
+      - file.name
+      - exercise_name
+      - body_part
+      - formula.pr_label
+      - pr_date
+
+  - type: table
+    name: "全件テーブル"
+    order:
+      - file.name
+      - exercise_name
+      - body_part
+      - secondary
+      - pr_weight
+      - pr_reps
+      - pr_date
+      - default_routine

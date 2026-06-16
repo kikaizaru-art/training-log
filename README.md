@@ -74,6 +74,10 @@ tags: [health, training-log, readme, meta]
 
 ## 運用フロー
 
+### 当日提示（事前）
+
+「今日の筋トレ」「今日のメニュー」等の発話で、Claude が [[daily-schedule]] のルールに従って曜日別メニュー（休養日は未刺激種目）を提示する。
+
 ### 当日記録
 
 1. 筋トレ実施後、Claude に「今日の筋トレ報告」と話しかける
@@ -96,5 +100,6 @@ tags: [health, training-log, readme, meta]
 ## 関連ノート
 
 - [[_index]] - training-log トップ
+- [[daily-schedule]] - 曜日別スケジュール提示ルール（事前提示）
 - [[_template-session]] - セッションテンプレ
 - [[exercises/_template-exercise]] - 種目マスタテンプレ

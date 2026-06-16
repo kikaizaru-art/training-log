@@ -20,6 +20,8 @@ tags: [health, training-log, area-index, meta]
 
 各 routine の種目リスト・デフォルト値は [[routines]] を参照（SSoT、2026-05-23 切り出し）。
 
+「今日は何やる？」の曜日別提示ルールは [[daily-schedule]] を参照（休養日は直近 training day の未刺激種目を提案）。
+
 ## Bases ビュー
 
 - [[training-sessions]] — セッション記録一覧

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>筋トレログ ダッシュボード</title>
+<style>
+  :root{
+    --bg:#0f1216; --card:#1a1f27; --card2:#222834; --line:#2c3442;
+    --fg:#e8edf3; --mut:#8b97a7; --accent:#4cc2ff; --good:#3ddc97;
+    --warn:#ffb454; --bad:#ff6b6b; --push:#ff8a5c; --leg:#6fcf5c; --pull:#5c9dff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+    background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-size:15px}
+  header{padding:18px 16px 10px;position:sticky;top:0;background:rgba(15,18,22,.92);
+    backdrop-filter:blur(8px);z-index:10;border-bottom:1px solid var(--line)}
+  h1{font-size:18px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+  h1 small{color:var(--mut);font-weight:400;font-size:12px}
+  nav{display:flex;gap:6px;overflow-x:auto}
+  nav button{flex:0 0 auto;background:var(--card);color:var(--mut);border:1px solid var(--line);
+    border-radius:999px;padding:7px 14px;font-size:13px;cursor:pointer}
+  nav button.active{background:var(--accent);color:#04121c;border-color:var(--accent);font-weight:700}
+  main{padding:14px 14px 60px;max-width:760px;margin:0 auto}
+  .tab{display:none}.tab.active{display:block}
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .card .k{color:var(--mut);font-size:12px;margin-bottom:6px}
+  .card .v{font-size:24px;font-weight:800;letter-spacing:.5px}
+  .card .v small{font-size:13px;font-weight:600;color:var(--mut)}
+  section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:16px}
+  section h2{font-size:14px;margin:0 0 12px;color:var(--fg)}
+  section h2 .sub{color:var(--mut);font-weight:400;font-size:12px;margin-left:6px}
+  .chip{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700}
+  .chip.push{background:rgba(255,138,92,.18);color:var(--push)}
+  .chip.leg{background:rgba(111,207,92,.18);color:var(--leg)}
+  .chip.pull{background:rgba(92,157,255,.18);color:var(--pull)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+  th{color:var(--mut);font-weight:600;font-size:11px}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .grp{color:var(--accent);font-weight:700;font-size:12px;padding-top:14px}
+  .muted{color:var(--mut)}
+  .pill{font-size:11px;padding:2px 7px;border-radius:999px;font-weight:700}
+  .pill.ok{background:rgba(61,220,151,.15);color:var(--good)}
+  .pill.part{background:rgba(255,180,84,.15);color:var(--warn)}
+  .pill.skip{background:rgba(139,151,167,.15);color:var(--mut)}
+  .barrow{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:12px}
+  .barrow .lab{width:64px;flex:0 0 64px;color:var(--mut)}
+  .barrow .track{flex:1;background:var(--card2);border-radius:6px;height:14px;overflow:hidden}
+  .barrow .fill{height:100%;border-radius:6px}
+  .barrow .val{width:90px;flex:0 0 90px;text-align:right;font-variant-numeric:tabular-nums}
+  select,input,button.act{background:var(--card2);color:var(--fg);border:1px solid var(--line);
+    border-radius:9px;padding:9px 10px;font-size:14px;font-family:inherit}
+  select{width:100%}
+  .formrow{display:grid;grid-template-columns:1fr 64px 64px 50px;gap:8px;align-items:center;margin-bottom:8px}
+  .formrow .nm{font-size:13px}
+  .formrow input{width:100%;text-align:center}
+  .formhead{display:grid;grid-template-columns:1fr 64px 64px 50px;gap:8px;color:var(--mut);font-size:11px;margin-bottom:6px}
+  .formrow input[disabled]{opacity:.4}
+  button.act{cursor:pointer;font-weight:700}
+  button.primary{background:var(--accent);color:#04121c;border-color:var(--accent)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  label.fl{display:block;font-size:11px;color:var(--mut);margin:0 0 4px}
+  textarea{width:100%;min-height:200px;background:#0b0e12;color:#cfe;border:1px solid var(--line);
+    border-radius:10px;padding:10px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+  svg{display:block;width:100%;height:auto}
+  .legend{display:flex;gap:14px;font-size:11px;color:var(--mut);margin-top:6px;flex-wrap:wrap}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:middle}
+  .empty{color:var(--mut);font-size:13px;padding:20px 0;text-align:center}
+  .foot{color:var(--mut);font-size:11px;text-align:center;margin-top:20px}
+  details summary{cursor:pointer;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  .setline{font-size:12px;color:var(--mut);padding:2px 0 2px 12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>💪 筋トレログ <small id="genat"></small></h1>
+  <nav id="nav">
+    <button data-tab="dash" class="active">ダッシュボード</button>
+    <button data-tab="ex">種目別</button>
+    <button data-tab="hist">履歴</button>
+    <button data-tab="rec">記録する</button>
+  </nav>
+</header>
+<main>
+  <div class="tab active" id="tab-dash"></div>
+  <div class="tab" id="tab-ex"></div>
+  <div class="tab" id="tab-hist"></div>
+  <div class="tab" id="tab-rec"></div>
+  <div class="foot">データ: <code>sessions/</code> <code>exercises/</code> の Markdown（SSoT）→ <code>node build.mjs</code> で再生成</div>
+</main>
+<script>
+const ROUTINE_CLASS = {"上半身push":"push","脚＋体幹":"leg","Pull＋仕上げ":"pull"};
+const ROUTINE_LABEL = {"上半身push":"💪 上半身push","脚＋体幹":"🦵 脚＋体幹","Pull＋仕上げ":"🔙 Pull＋仕上げ"};
+// 種目マスタに無い種目の部位フォールバック
+const EXTRA_BP = {"ライイングリアレイズ":"肩","ゴム補助懸垂":"背中","ネガティヴ懸垂":"背中"};
+const BP_ORDER = ["胸","背中","肩","脚","腕","体幹","その他"];
+// 記録フォーム用 routine 定義（前回値が無い時の既定）
+const ROUTINES = {
+  "上半身push":{weekday:"火",ex:[
+    {n:"ダンベルプレス",sets:3,reps:11,kg:36,bw:false},
+    {n:"ショルダープレス",sets:3,reps:11,kg:28,bw:false},
+    {n:"ベントオーバーロー",sets:3,reps:11,kg:36,bw:false},
+    {n:"ライイングリアレイズ",sets:3,reps:10,kg:6,bw:false}]},
+  "脚＋体幹":{weekday:"木",ex:[
+    {n:"ブルガリアンスクワット",sets:3,reps:11,kg:44,bw:false},
+    {n:"カーフレイズ",sets:3,reps:16,kg:32,bw:false},
+    {n:"プランク",sets:3,reps:60,kg:0,bw:true}]},
+  "Pull＋仕上げ":{weekday:"土",ex:[
+    {n:"ルーマニアンデッドリフト",sets:3,reps:11,kg:64,bw:false},
+    {n:"懸垂",sets:1,reps:7,kg:0,bw:true},
+    {n:"ゴム補助懸垂",sets:1,reps:10,kg:0,bw:true},
+    {n:"ネガティヴ懸垂",sets:1,reps:10,kg:0,bw:true},
+    {n:"ベントオーバーロー",sets:3,reps:11,kg:36,bw:false},
+    {n:"ディップス",sets:3,reps:11,kg:0,bw:true},
+    {n:"ライイングリアレイズ",sets:3,reps:10,kg:6,bw:false}]},
+};
+const $ = (s,el=document)=>el.querySelector(s);
+const el = (h)=>{const t=document.createElement("template");t.innerHTML=h.trim();return t.content.firstChild;};
+const fmtDate = (d)=>d||"—";
+const daysAgo = (d)=>{ if(!d) return null; const ms=Date.now()-new Date(d+"T00:00:00").getTime(); return Math.floor(ms/86400000); };
+
+let DATA=null, BP_MAP={};
+
+fetch("data.json").then(r=>r.json()).then(d=>{ DATA=d; init(d); })
+  .catch(e=>{ $("#tab-dash").innerHTML='<section class="empty">data.json を読み込めません。<br><code>node build.mjs</code> を実行し、ローカルサーバ（例: <code>python3 -m http.server</code>）か GitHub Pages 経由で開いてください。</section>'; });
+
+function bodyPartOf(name){ return BP_MAP[name] || EXTRA_BP[name] || "その他"; }
+
+function init(d){
+  $("#genat").textContent = "更新 "+ (d.generatedAt||"").slice(0,10);
+  for(const ex of d.exercises) BP_MAP[ex.name]=ex.body_part;
+  renderDash(d); renderEx(d); renderHist(d); renderRec(d);
+  $("#nav").addEventListener("click",e=>{
+    const b=e.target.closest("button[data-tab]"); if(!b) return;
+    document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("active",x===b));
+    document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.id==="tab-"+b.dataset.tab));
+    window.scrollTo(0,0);
+  });
+}
+
+/* ---------- 折れ線チャート (SVG) ---------- */
+function lineChart(points,{color="#4cc2ff",h=140,fmt=(v)=>v}={}){
+  if(points.length===0) return '<div class="empty">データなし</div>';
+  const W=320,H=h,pad={l:34,r:8,t:10,b:22};
+  const xs=points.map((_,i)=>i), ys=points.map(p=>p.y);
+  const ymin=Math.min(...ys), ymax=Math.max(...ys);
+  const lo=ymin===ymax?ymin-1:ymin, hi=ymin===ymax?ymax+1:ymax;
+  const px=(i)=> pad.l + (points.length===1?0.5:i/(points.length-1))*(W-pad.l-pad.r);
+  const py=(v)=> pad.t + (1-(v-lo)/(hi-lo))*(H-pad.t-pad.b);
+  let path=points.map((p,i)=>(i?"L":"M")+px(i).toFixed(1)+" "+py(p.y).toFixed(1)).join(" ");
+  let dots=points.map((p,i)=>`<circle cx="${px(i).toFixed(1)}" cy="${py(p.y).toFixed(1)}" r="2.6" fill="${color}"/>`).join("");
+  const gy=[lo,(lo+hi)/2,hi];
+  let grid=gy.map(v=>`<line x1="${pad.l}" y1="${py(v).toFixed(1)}" x2="${W-pad.r}" y2="${py(v).toFixed(1)}" stroke="#2c3442" stroke-width="1"/>
+    <text x="2" y="${(py(v)+3).toFixed(1)}" fill="#8b97a7" font-size="9">${fmt(Math.round(v))}</text>`).join("");
+  const step=Math.ceil(points.length/6);
+  let xlab=points.map((p,i)=> (i%step===0||i===points.length-1)?`<text x="${px(i).toFixed(1)}" y="${H-6}" fill="#8b97a7" font-size="8" text-anchor="middle">${p.x}</text>`:"").join("");
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+    ${grid}<path d="${path}" fill="none" stroke="${color}" stroke-width="2"/>${dots}${xlab}</svg>`;
+}
+
+/* ---------- ダッシュボード ---------- */
+function renderDash(d){
+  const root=$("#tab-dash"); root.innerHTML="";
+  const completed=d.sessions.filter(s=>s.status!=="skipped");
+  const last=completed.at(-1);
+  const ym=(last?.date||"").slice(0,7);
+  const monthSessions=d.sessions.filter(s=>(s.date||"").startsWith(ym));
+  const monthVol=monthSessions.reduce((a,s)=>a+(s.total_volume_kg||0),0);
+  const recent=d.sessions.filter(s=>daysAgo(s.date)<=28);
+  const compRate=recent.length? Math.round(recent.filter(s=>s.status==="completed").length/recent.length*100):0;
+  const lastAgo=daysAgo(last?.date);
+
+  root.appendChild(el(`<div class="cards">
+    <div class="card"><div class="k">直近セッション</div><div class="v">${last?last.date.slice(5):"—"}<small> ${lastAgo!=null?lastAgo+"日前":""}</small></div></div>
+    <div class="card"><div class="k">${ym} 総ボリューム</div><div class="v">${monthVol.toLocaleString()}<small> kg</small></div></div>
+    <div class="card"><div class="k">${ym} 記録数</div><div class="v">${monthSessions.length}<small> 回</small></div></div>
+    <div class="card"><div class="k">直近4週 完了率</div><div class="v">${compRate}<small> %</small></div></div>
+  </div>`));
+
+  // 総ボリューム推移
+  const volPts=d.sessions.filter(s=>s.total_volume_kg>0).slice(-16).map(s=>({x:s.date.slice(5),y:s.total_volume_kg}));
+  root.appendChild(el(`<section><h2>総ボリューム推移 <span class="sub">直近${volPts.length}セッション (加重種目)</span></h2>${lineChart(volPts,{color:"#4cc2ff",fmt:v=>v>=1000?(v/1000).toFixed(1)+"k":v})}</section>`));
+
+  // 部位別 最終実施日
+  const lastByBp={};
+  for(const s of d.sessions){ if(s.status==="skipped")continue;
+    for(const ex of s.exercises){ const bp=bodyPartOf(ex.name);
+      if(!lastByBp[bp]||s.date>lastByBp[bp]) lastByBp[bp]=s.date; } }
+  const bpRows=BP_ORDER.filter(bp=>lastByBp[bp]).map(bp=>{
+    const ago=daysAgo(lastByBp[bp]);
+    const col=ago<=4?"var(--good)":ago<=9?"var(--warn)":"var(--bad)";
+    const w=Math.max(4,Math.min(100,100-ago*5));
+    return `<div class="barrow"><div class="lab">${bp}</div>
+      <div class="track"><div class="fill" style="width:${w}%;background:${col}"></div></div>
+      <div class="val">${lastByBp[bp].slice(5)} <span class="muted">${ago}日前</span></div></div>`;
+  }).join("");
+  root.appendChild(el(`<section><h2>部位別 最終実施日 <span class="sub">何日刺激していないか</span></h2>${bpRows||'<div class="empty">データなし</div>'}</section>`));
+}
+
+/* ---------- 種目別 ---------- */
+function renderEx(d){
+  const root=$("#tab-ex"); root.innerHTML="";
+  // PR一覧（部位別）
+  let prHtml='<table><thead><tr><th>種目</th><th class="num">ベスト</th><th class="num">達成日</th></tr></thead><tbody>';
+  for(const bp of BP_ORDER){
+    const list=d.exercises.filter(e=>e.body_part===bp);
+    if(!list.length) continue;
+    prHtml+=`<tr><td class="grp" colspan="3">${bp}</td></tr>`;
+    for(const e of list){
+      const best=e.bodyweight||e.pr_weight===0?`自重 × ${e.pr_reps}回`:`${e.pr_weight}kg × ${e.pr_reps}回`;
+      prHtml+=`<tr><td>${e.name}</td><td class="num">${best}</td><td class="num muted">${e.pr_date?e.pr_date.slice(5):"—"}</td></tr>`;
+    }
+  }
+  prHtml+='</tbody></table>';
+  root.appendChild(el(`<section><h2>PR一覧 <span class="sub">部位別ベスト記録</span></h2>${prHtml}</section>`));
+
+  // 種目別 進捗グラフ
+  const names=[...new Set(d.sessions.flatMap(s=>s.exercises.map(e=>e.name)))].sort();
+  const sel=el(`<select id="exsel">${names.map(n=>`<option>${n}</option>`).join("")}</select>`);
+  const chartBox=el('<div id="exchart"></div>');
+  const sec=el('<section><h2>種目別 進捗</h2></section>');
+  sec.appendChild(sel); sec.appendChild(chartBox); root.appendChild(sec);
+  const draw=(name)=>{
+    const rows=[];
+    for(const s of d.sessions){ const ex=s.exercises.find(e=>e.name===name); if(!ex)continue;
+      const bw=ex.bodyweight; rows.push({date:s.date, y: bw?ex.totalReps:ex.topWeight, bw}); }
+    const bw=rows.length&&rows.every(r=>r.bw);
+    const pts=rows.map(r=>({x:r.date.slice(5),y:r.y}));
+    const unit=bw?"回(合計)":"kg(最大)";
+    chartBox.innerHTML=`<div class="legend"><span><i style="background:#3ddc97"></i>${bw?"自重 総レップ":"最大重量"} <span class="muted">(${unit})</span></span></div>`
+      + lineChart(pts,{color:"#3ddc97",fmt:v=>v});
+  };
+  sel.addEventListener("change",()=>draw(sel.value));
+  draw(names[0]);
+}
+
+/* ---------- 履歴 ---------- */
+function renderHist(d){
+  const root=$("#tab-hist"); root.innerHTML="";
+  const sec=el('<section><h2>セッション履歴 <span class="sub">新しい順・タップで詳細</span></h2></section>');
+  const sorted=[...d.sessions].sort((a,b)=>b.date.localeCompare(a.date));
+  for(const s of sorted){
+    const cls=ROUTINE_CLASS[s.routine]||"";
+    const st=s.status==="completed"?'<span class="pill ok">完了</span>':s.status==="partial"?'<span class="pill part">部分</span>':'<span class="pill skip">skip</span>';
+    const cm=[s.condition?`体調${s.condition}`:"",s.mood?`気分${s.mood}`:""].filter(Boolean).join(" / ");
+    const sets=s.exercises.map(ex=>{
+      const detail=ex.sets.map(set=>set.bodyweight?`自重×${set.reps}`:`${set.weight}kg×${set.reps}`).join(", ");
+      return `<div class="setline">・<b>${ex.name}</b> — ${detail}</div>`;
+    }).join("");
+    root.appendChild(el(`<details><summary><section style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div><b>${s.date.slice(5)}</b> <span class="muted">(${s.weekday||""})</span> <span class="chip ${cls}">${ROUTINE_LABEL[s.routine]||s.routine}</span></div>
+        ${st}</div>
+      <div class="muted" style="font-size:12px;margin-top:6px">総ボリューム ${(s.total_volume_kg||0).toLocaleString()}kg ${cm?" ・ "+cm:""}</div>
+      </section></summary><section style="margin-top:-8px">${sets||'<div class="empty">種目記録なし</div>'}</section></details>`));
+  }
+}
+
+/* ---------- 記録フォーム ---------- */
+function lastPerformed(d,name){
+  for(let i=d.sessions.length-1;i>=0;i--){ const ex=d.sessions[i].exercises.find(e=>e.name===name); if(ex) return ex; }
+  return null;
+}
+function renderRec(d){
+  const root=$("#tab-rec"); root.innerHTML="";
+  const today=new Date().toISOString().slice(0,10);
+  const sec=el(`<section><h2>新規セッションを記録</h2>
+    <div class="row2" style="margin-bottom:10px">
+      <div><label class="fl">日付</label><input id="f-date" type="date" value="${today}"></div>
+      <div><label class="fl">ルーティン</label><select id="f-routine">${Object.keys(ROUTINES).map(r=>`<option>${r}</option>`).join("")}</select></div>
+    </div>
+    <div class="row3" style="margin-bottom:14px">
+      <div><label class="fl">体調(1-5)</label><input id="f-cond" type="number" min="1" max="5" placeholder="任意"></div>
+      <div><label class="fl">気分(1-5)</label><input id="f-mood" type="number" min="1" max="5" placeholder="任意"></div>
+      <div><label class="fl">状態</label><select id="f-status"><option>completed</option><option>partial</option><option>skipped</option></select></div>
+    </div>
+    <div class="formhead"><div>種目</div><div>kg</div><div>回</div><div>set</div></div>
+    <div id="f-ex"></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="act primary" id="f-gen" style="flex:1">Markdown 生成</button>
+      <button class="act" id="f-copy">コピー</button>
+      <button class="act" id="f-dl">.md DL</button>
+    </div>
+    <div style="margin-top:6px;color:var(--mut);font-size:11px">生成した内容を <code>sessions/&lt;ファイル名&gt;</code> として保存・コミットすると SSoT に反映されます。</div>
+    <textarea id="f-out" style="margin-top:10px" placeholder="「Markdown 生成」を押すとここに出力されます"></textarea>
+  </section>`);
+  root.appendChild(sec);
+
+  const exBox=$("#f-ex",sec);
+  function buildRows(routine){
+    exBox.innerHTML="";
+    for(const e of ROUTINES[routine].ex){
+      const lp=lastPerformed(d,e.n);
+      const kg = lp && !lp.bodyweight && lp.sets[0] ? lp.sets[0].weight : e.kg;
+      const reps = lp && lp.sets[0] ? lp.sets[0].reps : e.reps;
+      const sets = lp ? lp.sets.length : e.sets;
+      const bw = lp ? lp.bodyweight : e.bw;
+      exBox.appendChild(el(`<div class="formrow" data-name="${e.n}" data-bw="${bw}">
+        <div class="nm">${e.n}${bw?' <span class="muted">自重</span>':''}</div>
+        <input class="f-kg" type="number" step="0.5" value="${bw?'':kg}" ${bw?'disabled':''}>
+        <input class="f-reps" type="number" value="${reps}">
+        <input class="f-sets" type="number" value="${sets}"></div>`));
+    }
+  }
+  $("#f-routine",sec).addEventListener("change",e=>buildRows(e.target.value));
+  buildRows(Object.keys(ROUTINES)[0]);
+
+  function gen(){
+    const date=$("#f-date",sec).value||today;
+    const routine=$("#f-routine",sec).value;
+    const wd=ROUTINES[routine].weekday;
+    const cond=$("#f-cond",sec).value, mood=$("#f-mood",sec).value, status=$("#f-status",sec).value;
+    let totalVol=0; let body="";
+    exBox.querySelectorAll(".formrow").forEach(r=>{
+      const name=r.dataset.name, bw=r.dataset.bw==="true";
+      const kg=parseFloat($(".f-kg",r).value)||0, reps=parseInt($(".f-reps",r).value)||0, sets=parseInt($(".f-sets",r).value)||0;
+      if(reps<=0||sets<=0) return;
+      body+=`### ${name}\n`;
+      for(let i=1;i<=sets;i++) body+=`- セット${i}: ${bw?'自重':kg+'kg'} × ${reps}回\n`;
+      if(bw){ body+=`- ボリューム: 自重種目のためボリューム計算対象外\n`; }
+      else { const v=kg*reps*sets; totalVol+=v; body+=`- ボリューム: ${kg}*${reps}*${sets} = ${v}kg\n`; }
+      body+=`- メモ: \n\n`;
+    });
+    const fm=`---
+type: training-session
+project: health-training
+date: ${date}
+weekday: ${wd}
+routine: ${routine}
+condition:${cond?" "+cond:""}
+mood:${mood?" "+mood:""}
+total_volume_kg: ${totalVol}
+status: ${status}
+created: ${today}
+updated: ${today}
+tags: [training-session, health, ${routine}]
+---
+
+# 筋トレ記録 ${date} (${wd}) - ${routine}
+
+## 種目別記録
+
+${body}## 次回への申し送り
+
+-
+`;
+    $("#f-out",sec).value=fm;
+    return {fm,fname:`${date}_${routine}.md`};
+  }
+  $("#f-gen",sec).addEventListener("click",gen);
+  $("#f-copy",sec).addEventListener("click",()=>{const o=$("#f-out",sec).value||gen().fm;navigator.clipboard?.writeText(o);$("#f-copy",sec).textContent="✓";setTimeout(()=>$("#f-copy",sec).textContent="コピー",1200);});
+  $("#f-dl",sec).addEventListener("click",()=>{const g=gen();const b=new Blob([g.fm],{type:"text/markdown"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=g.fname;a.click();});
+}
+</script>
+</body>
+</html>

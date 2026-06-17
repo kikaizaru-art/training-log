@@ -97,15 +97,15 @@ Bases の「部位別」グルーピングを機能させるため、`body_part`
 
 ### 当日記録
 
-入力方法は2通り。どちらで記録しても保存先・スキーマは同じ。
+入力方法は2通り。どちらで記録しても保存先・スキーマは同じ（`sessions/YYYY-MM-DD_<routine>.md`）。
 
-**A. フォーム入力（日本語フォーム式 / 推奨）**
+**A. HTML ダッシュボードで記録（推奨）**
 
-1. `templates/session-<routine>.md`（前回値プリフィル済み）を新規ノートとして複製
-2. 上部のフォーム欄（Meta Bind）で体調・気分・状態をタップ選択
-3. 各種目の重量×回数を数値だけ上書き → `sessions/YYYY-MM-DD_<routine>.md` で保存
+1. `dashboard/index.html` を開き「記録する」タブを選択
+2. routine を選ぶと前回値がプリフィルされるので、重量×回数を数値入力
+3. 「Markdown 生成」→ コピー / `.md` ダウンロード → `sessions/` に保存してコミット
 
-導入手順は [[templates/_フォーム入力ガイド]] を参照（必要プラグイン: Meta Bind / Templater）。
+ダッシュボードは同じデータから総ボリューム推移・種目別進捗・部位別PR・履歴も表示する。導入は [[dashboard/README]] 参照。
 
 **B. 対話入力（Claude）**
 

@@ -1,0 +1,1888 @@
+{
+  "generatedAt": "2026-06-17T23:19:44.051Z",
+  "sessions": [
+    {
+      "file": "2026-05-05_上半身push.md",
+      "date": "2026-05-05",
+      "weekday": "火",
+      "routine": "上半身push",
+      "condition": 3,
+      "mood": 3,
+      "total_volume_kg": 3180,
+      "status": "completed",
+      "exercises": [
+        {
+          "name": "ダンベルプレス",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 10
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 30,
+          "volume": 1080,
+          "bodyweight": false
+        },
+        {
+          "name": "ショルダープレス",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 10
+            }
+          ],
+          "topWeight": 28,
+          "totalReps": 30,
+          "volume": 840,
+          "bodyweight": false
+        },
+        {
+          "name": "ベントオーバーロー",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 10
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 30,
+          "volume": 1080,
+          "bodyweight": false
+        },
+        {
+          "name": "ライイングリアレイズ",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            }
+          ],
+          "topWeight": 6,
+          "totalReps": 30,
+          "volume": 180,
+          "bodyweight": false
+        }
+      ]
+    },
+    {
+      "file": "2026-05-07_木_脚＋体幹.md",
+      "date": "2026-05-07",
+      "weekday": "木",
+      "routine": "脚＋体幹",
+      "condition": 3,
+      "mood": 3,
+      "total_volume_kg": 2712,
+      "status": "partial",
+      "exercises": [
+        {
+          "name": "ブルガリアンスクワット",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 44,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 44,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 44,
+              "reps": 11
+            }
+          ],
+          "topWeight": 44,
+          "totalReps": 33,
+          "volume": 1452,
+          "bodyweight": false
+        },
+        {
+          "name": "カーフレイズ",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 15
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 15
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 15
+            }
+          ],
+          "topWeight": 28,
+          "totalReps": 45,
+          "volume": 1260,
+          "bodyweight": false
+        },
+        {
+          "name": "プランク",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 60
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 60
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 60
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 180,
+          "volume": 0,
+          "bodyweight": true
+        }
+      ]
+    },
+    {
+      "file": "2026-05-09_Pull＋仕上げ.md",
+      "date": "2026-05-09",
+      "weekday": "土",
+      "routine": "Pull＋仕上げ",
+      "condition": null,
+      "mood": null,
+      "total_volume_kg": 3288,
+      "status": "completed",
+      "exercises": [
+        {
+          "name": "ルーマニアンデッドリフト",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 10
+            }
+          ],
+          "topWeight": 64,
+          "totalReps": 30,
+          "volume": 1920,
+          "bodyweight": false
+        },
+        {
+          "name": "懸垂",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 6
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 6,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ネガティヴ懸垂",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 10
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 10,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ベントオーバーロー",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 33,
+          "volume": 1188,
+          "bodyweight": false
+        },
+        {
+          "name": "ディップス",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 10
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 10
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 10
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 30,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ライイングリアレイズ",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            }
+          ],
+          "topWeight": 6,
+          "totalReps": 30,
+          "volume": 180,
+          "bodyweight": false
+        }
+      ]
+    },
+    {
+      "file": "2026-05-12_上半身push.md",
+      "date": "2026-05-12",
+      "weekday": "火",
+      "routine": "上半身push",
+      "condition": null,
+      "mood": null,
+      "total_volume_kg": 3480,
+      "status": "completed",
+      "exercises": [
+        {
+          "name": "ダンベルプレス",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 33,
+          "volume": 1188,
+          "bodyweight": false
+        },
+        {
+          "name": "ショルダープレス",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 11
+            }
+          ],
+          "topWeight": 28,
+          "totalReps": 33,
+          "volume": 924,
+          "bodyweight": false
+        },
+        {
+          "name": "ベントオーバーロー",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 33,
+          "volume": 1188,
+          "bodyweight": false
+        },
+        {
+          "name": "ライイングリアレイズ",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            }
+          ],
+          "topWeight": 6,
+          "totalReps": 30,
+          "volume": 180,
+          "bodyweight": false
+        }
+      ]
+    },
+    {
+      "file": "2026-05-14_脚＋体幹.md",
+      "date": "2026-05-14",
+      "weekday": "木",
+      "routine": "脚＋体幹",
+      "condition": "null",
+      "mood": "null",
+      "total_volume_kg": 2580,
+      "status": "partial",
+      "exercises": [
+        {
+          "name": "ブルガリアンスクワット",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 44,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 44,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 44,
+              "reps": 10
+            }
+          ],
+          "topWeight": 44,
+          "totalReps": 30,
+          "volume": 1320,
+          "bodyweight": false
+        },
+        {
+          "name": "カーフレイズ",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 15
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 15
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 15
+            }
+          ],
+          "topWeight": 28,
+          "totalReps": 45,
+          "volume": 1260,
+          "bodyweight": false
+        },
+        {
+          "name": "プランク",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 60
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 60
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 60
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 180,
+          "volume": 0,
+          "bodyweight": true
+        }
+      ]
+    },
+    {
+      "file": "2026-05-16_Pull＋仕上げ.md",
+      "date": "2026-05-16",
+      "weekday": "土",
+      "routine": "Pull＋仕上げ",
+      "condition": null,
+      "mood": null,
+      "total_volume_kg": 3288,
+      "status": "completed",
+      "exercises": [
+        {
+          "name": "ルーマニアンデッドリフト",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 10
+            }
+          ],
+          "topWeight": 64,
+          "totalReps": 30,
+          "volume": 1920,
+          "bodyweight": false
+        },
+        {
+          "name": "懸垂",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 6
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 6,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ネガティヴ懸垂",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 10
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 10,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ベントオーバーロー",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 33,
+          "volume": 1188,
+          "bodyweight": false
+        },
+        {
+          "name": "ディップス",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 10
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 10
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 10
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 30,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ライイングリアレイズ",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            }
+          ],
+          "topWeight": 6,
+          "totalReps": 30,
+          "volume": 180,
+          "bodyweight": false
+        }
+      ]
+    },
+    {
+      "file": "2026-05-21_脚＋体幹.md",
+      "date": "2026-05-21",
+      "weekday": "木",
+      "routine": "脚＋体幹",
+      "condition": "null",
+      "mood": "null",
+      "total_volume_kg": 2712,
+      "status": "partial",
+      "exercises": [
+        {
+          "name": "ブルガリアンスクワット",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 44,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 44,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 44,
+              "reps": 11
+            }
+          ],
+          "topWeight": 44,
+          "totalReps": 33,
+          "volume": 1452,
+          "bodyweight": false
+        },
+        {
+          "name": "カーフレイズ",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 15
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 15
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 15
+            }
+          ],
+          "topWeight": 28,
+          "totalReps": 45,
+          "volume": 1260,
+          "bodyweight": false
+        },
+        {
+          "name": "プランク",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 60
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 60
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 60
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 180,
+          "volume": 0,
+          "bodyweight": true
+        }
+      ]
+    },
+    {
+      "file": "2026-05-23_Pull＋仕上げ.md",
+      "date": "2026-05-23",
+      "weekday": "土",
+      "routine": "Pull＋仕上げ",
+      "condition": null,
+      "mood": null,
+      "total_volume_kg": 3300,
+      "status": "completed",
+      "exercises": [
+        {
+          "name": "ルーマニアンデッドリフト",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 11
+            }
+          ],
+          "topWeight": 64,
+          "totalReps": 33,
+          "volume": 2112,
+          "bodyweight": false
+        },
+        {
+          "name": "ベントオーバーロー",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 33,
+          "volume": 1188,
+          "bodyweight": false
+        },
+        {
+          "name": "ディップス",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 11
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 11
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 11
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 33,
+          "volume": 0,
+          "bodyweight": true
+        }
+      ]
+    },
+    {
+      "file": "2026-05-24_Pull＋仕上げ-キャッチアップ.md",
+      "date": "2026-05-24",
+      "weekday": "日",
+      "routine": "Pull＋仕上げ",
+      "condition": null,
+      "mood": null,
+      "total_volume_kg": 180,
+      "status": "completed",
+      "exercises": [
+        {
+          "name": "懸垂",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 6
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 6,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ゴム補助懸垂",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 10
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 10,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ネガティヴ懸垂",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 10
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 10,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ライイングリアレイズ",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            }
+          ],
+          "topWeight": 6,
+          "totalReps": 30,
+          "volume": 180,
+          "bodyweight": false
+        }
+      ]
+    },
+    {
+      "file": "2026-05-26_上半身push.md",
+      "date": "2026-05-26",
+      "weekday": "火",
+      "routine": "上半身push",
+      "condition": null,
+      "mood": null,
+      "total_volume_kg": 3480,
+      "status": "completed",
+      "exercises": [
+        {
+          "name": "ダンベルプレス",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 33,
+          "volume": 1188,
+          "bodyweight": false
+        },
+        {
+          "name": "ショルダープレス",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 11
+            }
+          ],
+          "topWeight": 28,
+          "totalReps": 33,
+          "volume": 924,
+          "bodyweight": false
+        },
+        {
+          "name": "ベントオーバーロー",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 33,
+          "volume": 1188,
+          "bodyweight": false
+        },
+        {
+          "name": "ライイングリアレイズ",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            }
+          ],
+          "topWeight": 6,
+          "totalReps": 30,
+          "volume": 180,
+          "bodyweight": false
+        }
+      ]
+    },
+    {
+      "file": "2026-05-28_脚＋体幹.md",
+      "date": "2026-05-28",
+      "weekday": "木",
+      "routine": "脚＋体幹",
+      "condition": "null",
+      "mood": "null",
+      "total_volume_kg": 2988,
+      "status": "partial",
+      "exercises": [
+        {
+          "name": "ブルガリアンスクワット",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 44,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 44,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 44,
+              "reps": 11
+            }
+          ],
+          "topWeight": 44,
+          "totalReps": 33,
+          "volume": 1452,
+          "bodyweight": false
+        },
+        {
+          "name": "カーフレイズ",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 32,
+              "reps": 16
+            },
+            {
+              "bodyweight": false,
+              "weight": 32,
+              "reps": 16
+            },
+            {
+              "bodyweight": false,
+              "weight": 32,
+              "reps": 16
+            }
+          ],
+          "topWeight": 32,
+          "totalReps": 48,
+          "volume": 1536,
+          "bodyweight": false
+        },
+        {
+          "name": "プランク",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 60
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 60
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 60
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 180,
+          "volume": 0,
+          "bodyweight": true
+        }
+      ]
+    },
+    {
+      "file": "2026-05-30_Pull＋仕上げ.md",
+      "date": "2026-05-30",
+      "weekday": "土",
+      "routine": "Pull＋仕上げ",
+      "condition": null,
+      "mood": null,
+      "total_volume_kg": 3300,
+      "status": "completed",
+      "exercises": [
+        {
+          "name": "ルーマニアンデッドリフト",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 11
+            }
+          ],
+          "topWeight": 64,
+          "totalReps": 33,
+          "volume": 2112,
+          "bodyweight": false
+        },
+        {
+          "name": "ベントオーバーロー",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 33,
+          "volume": 1188,
+          "bodyweight": false
+        },
+        {
+          "name": "ディップス",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 11
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 11
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 11
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 33,
+          "volume": 0,
+          "bodyweight": true
+        }
+      ]
+    },
+    {
+      "file": "2026-05-31_Pull＋仕上げ-キャッチアップ.md",
+      "date": "2026-05-31",
+      "weekday": "日",
+      "routine": "Pull＋仕上げ",
+      "condition": null,
+      "mood": null,
+      "total_volume_kg": 180,
+      "status": "completed",
+      "exercises": [
+        {
+          "name": "懸垂",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 6
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 6,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ゴム補助懸垂",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 10
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 10,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ネガティヴ懸垂",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 10
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 10,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ライイングリアレイズ",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            }
+          ],
+          "topWeight": 6,
+          "totalReps": 30,
+          "volume": 180,
+          "bodyweight": false
+        }
+      ]
+    },
+    {
+      "file": "2026-06-02_上半身push.md",
+      "date": "2026-06-02",
+      "weekday": "火",
+      "routine": "上半身push",
+      "condition": null,
+      "mood": null,
+      "total_volume_kg": 3480,
+      "status": "completed",
+      "exercises": [
+        {
+          "name": "ダンベルプレス",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 33,
+          "volume": 1188,
+          "bodyweight": false
+        },
+        {
+          "name": "ショルダープレス",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 11
+            }
+          ],
+          "topWeight": 28,
+          "totalReps": 33,
+          "volume": 924,
+          "bodyweight": false
+        },
+        {
+          "name": "ベントオーバーロー",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 33,
+          "volume": 1188,
+          "bodyweight": false
+        },
+        {
+          "name": "ライイングリアレイズ",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            }
+          ],
+          "topWeight": 6,
+          "totalReps": 30,
+          "volume": 180,
+          "bodyweight": false
+        }
+      ]
+    },
+    {
+      "file": "2026-06-06_Pull＋仕上げ.md",
+      "date": "2026-06-06",
+      "weekday": "土",
+      "routine": "Pull＋仕上げ",
+      "condition": null,
+      "mood": null,
+      "total_volume_kg": 180,
+      "status": "completed",
+      "exercises": [
+        {
+          "name": "懸垂",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 6
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 6,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ゴム補助懸垂",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 10
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 10,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ネガティヴ懸垂",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 10
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 10,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ディップス",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 11
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 11
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 11
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 33,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ライイングリアレイズ",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            }
+          ],
+          "topWeight": 6,
+          "totalReps": 30,
+          "volume": 180,
+          "bodyweight": false
+        }
+      ]
+    },
+    {
+      "file": "2026-06-07_Pull＋仕上げ-キャッチアップ.md",
+      "date": "2026-06-07",
+      "weekday": "日",
+      "routine": "Pull＋仕上げ",
+      "condition": null,
+      "mood": null,
+      "total_volume_kg": 3300,
+      "status": "completed",
+      "exercises": [
+        {
+          "name": "ルーマニアンデッドリフト",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 11
+            }
+          ],
+          "topWeight": 64,
+          "totalReps": 33,
+          "volume": 2112,
+          "bodyweight": false
+        },
+        {
+          "name": "ベントオーバーロー",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 33,
+          "volume": 1188,
+          "bodyweight": false
+        }
+      ]
+    },
+    {
+      "file": "2026-06-09_上半身push.md",
+      "date": "2026-06-09",
+      "weekday": "火",
+      "routine": "上半身push",
+      "condition": null,
+      "mood": null,
+      "total_volume_kg": 1368,
+      "status": "completed",
+      "exercises": [
+        {
+          "name": "ベントオーバーロー",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 33,
+          "volume": 1188,
+          "bodyweight": false
+        },
+        {
+          "name": "ライイングリアレイズ",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            }
+          ],
+          "topWeight": 6,
+          "totalReps": 30,
+          "volume": 180,
+          "bodyweight": false
+        }
+      ]
+    },
+    {
+      "file": "2026-06-10_上半身push-キャッチアップ.md",
+      "date": "2026-06-10",
+      "weekday": "水",
+      "routine": "上半身push",
+      "condition": null,
+      "mood": null,
+      "total_volume_kg": 2112,
+      "status": "completed",
+      "exercises": [
+        {
+          "name": "ダンベルプレス",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 33,
+          "volume": 1188,
+          "bodyweight": false
+        },
+        {
+          "name": "ショルダープレス",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 28,
+              "reps": 11
+            }
+          ],
+          "topWeight": 28,
+          "totalReps": 33,
+          "volume": 924,
+          "bodyweight": false
+        }
+      ]
+    },
+    {
+      "file": "2026-06-13_Pull＋仕上げ.md",
+      "date": "2026-06-13",
+      "weekday": "土",
+      "routine": "Pull＋仕上げ",
+      "condition": null,
+      "mood": null,
+      "total_volume_kg": 3480,
+      "status": "completed",
+      "exercises": [
+        {
+          "name": "ルーマニアンデッドリフト",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 64,
+              "reps": 11
+            }
+          ],
+          "topWeight": 64,
+          "totalReps": 33,
+          "volume": 2112,
+          "bodyweight": false
+        },
+        {
+          "name": "懸垂",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 7
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 7,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ネガティヴ懸垂",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 10
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 10,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ベントオーバーロー",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            },
+            {
+              "bodyweight": false,
+              "weight": 36,
+              "reps": 11
+            }
+          ],
+          "topWeight": 36,
+          "totalReps": 33,
+          "volume": 1188,
+          "bodyweight": false
+        },
+        {
+          "name": "ディップス",
+          "sets": [
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 11
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 11
+            },
+            {
+              "bodyweight": true,
+              "weight": null,
+              "reps": 11
+            }
+          ],
+          "topWeight": 0,
+          "totalReps": 33,
+          "volume": 0,
+          "bodyweight": true
+        },
+        {
+          "name": "ライイングリアレイズ",
+          "sets": [
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            },
+            {
+              "bodyweight": false,
+              "weight": 6,
+              "reps": 10
+            }
+          ],
+          "topWeight": 6,
+          "totalReps": 30,
+          "volume": 180,
+          "bodyweight": false
+        }
+      ]
+    }
+  ],
+  "exercises": [
+    {
+      "name": "カーフレイズ",
+      "body_part": "脚",
+      "body_part_detail": "ふくらはぎ（腓腹筋・ヒラメ筋）",
+      "secondary": "",
+      "default_routine": "木",
+      "bodyweight": false,
+      "pr_weight": 32,
+      "pr_reps": 16,
+      "pr_date": "2026-05-28"
+    },
+    {
+      "name": "ショルダープレス",
+      "body_part": "肩",
+      "body_part_detail": "三角筋前部",
+      "secondary": "三頭筋, 上部胸筋",
+      "default_routine": "火",
+      "bodyweight": false,
+      "pr_weight": 28,
+      "pr_reps": 11,
+      "pr_date": "2026-05-12"
+    },
+    {
+      "name": "ダンベルプレス",
+      "body_part": "胸",
+      "body_part_detail": "大胸筋中部",
+      "secondary": "肩前（三角筋前部）, 三頭筋",
+      "default_routine": "火",
+      "bodyweight": false,
+      "pr_weight": 36,
+      "pr_reps": 11,
+      "pr_date": "2026-05-12"
+    },
+    {
+      "name": "ディップス",
+      "body_part": "胸",
+      "body_part_detail": "大胸筋中部・下部",
+      "secondary": "三頭筋, 肩（前）",
+      "default_routine": "土",
+      "bodyweight": true,
+      "pr_weight": 0,
+      "pr_reps": 11,
+      "pr_date": "2026-05-23"
+    },
+    {
+      "name": "ブルガリアンスクワット",
+      "body_part": "脚",
+      "body_part_detail": "大腿四頭筋・大殿筋",
+      "secondary": "体幹",
+      "default_routine": "木",
+      "bodyweight": false,
+      "pr_weight": 44,
+      "pr_reps": 11,
+      "pr_date": "2026-05-07"
+    },
+    {
+      "name": "プランク",
+      "body_part": "体幹",
+      "body_part_detail": "腹直筋・腹横筋・腰背部",
+      "secondary": "",
+      "default_routine": "木",
+      "bodyweight": true,
+      "pr_weight": 0,
+      "pr_reps": 60,
+      "pr_date": "2026-05-07"
+    },
+    {
+      "name": "ベントオーバーロー",
+      "body_part": "背中",
+      "body_part_detail": "広背筋・僧帽筋中部・菱形筋",
+      "secondary": "腕（二頭筋）, 体幹",
+      "default_routine": "土",
+      "bodyweight": false,
+      "pr_weight": 36,
+      "pr_reps": 11,
+      "pr_date": "2026-05-09"
+    },
+    {
+      "name": "ルーマニアンデッドリフト",
+      "body_part": "脚",
+      "body_part_detail": "ハムストリングス・臀筋",
+      "secondary": "背中（脊柱起立筋）, 体幹",
+      "default_routine": "土",
+      "bodyweight": false,
+      "pr_weight": 64,
+      "pr_reps": 11,
+      "pr_date": "2026-05-23"
+    },
+    {
+      "name": "懸垂",
+      "body_part": "背中",
+      "body_part_detail": "広背筋・僧帽筋下部",
+      "secondary": "腕（二頭筋）, 体幹",
+      "default_routine": "土",
+      "bodyweight": true,
+      "pr_weight": 0,
+      "pr_reps": 7,
+      "pr_date": "2026-06-13"
+    }
+  ]
+}

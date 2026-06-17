@@ -1,7 +1,7 @@
 filters:
   and:
     - 'type == "training-exercise"'
-    - file.inFolder("20-Areas/health/training-log/exercises")
+    - file.inFolder("exercises")
     - 'file.basename != "_template-exercise"'
     - 'file.basename != "README"'
 
@@ -15,6 +15,8 @@ properties:
     displayName: "種目名"
   body_part:
     displayName: "部位"
+  body_part_detail:
+    displayName: "詳細筋"
   secondary:
     displayName: "補助筋"
   default_routine:

@@ -32,12 +32,13 @@ tags: [health, training-log, readme, meta]
 | `date` | date | ✅ | `2026-05-05` |
 | `weekday` | string | ✅ | `火` / `木` / `土` |
 | `routine` | string | ✅ | `上半身push` / `脚＋体幹` / `Pull＋仕上げ` |
-| `condition` | number | ✅ | 1-5（体調） |
-| `mood` | number | ✅ | 1-5（気分） |
-| `total_volume_kg` | number | ✅ | 全種目の重量×回数の合計 |
-| `status` | string | ✅ | `completed` / `partial` / `skipped` |
+| `condition` | number | - | 1-5（体調）。任意。記録があれば集計対象 |
+| `mood` | number | - | 1-5（気分）。任意 |
+| `total_volume_kg` | number | ✅ | 加重種目の重量×回数の合計（自重種目は対象外） |
+| `status` | string | ✅ | `completed` / `partial` / `skipped`（`complete` は不可。`completed` に統一） |
 | `created` | date | ✅ | JST 当日 |
-| `tags` | list | ✅ | `[training-session, health, ...]` |
+| `updated` | date | ✅ | 最終更新日（JST）。後日追記・修正時に更新 |
+| `tags` | list | ✅ | `[training-session, health, <routine>]` |
 
 ### type: training-exercise（種目マスタ）
 
@@ -45,15 +46,31 @@ tags: [health, training-log, readme, meta]
 |---|---|---|---|
 | `type` | string | ✅ | `training-exercise` |
 | `exercise_name` | string | ✅ | `ダンベルプレス` |
-| `body_part` | string | ✅ | 主部位（`胸（中）` 等） |
+| `body_part` | string | ✅ | 正規部位（`胸` / `背中` / `肩` / `脚` / `腕` / `体幹` のいずれか1値）。Bases の部位別グルーピングに使用 |
+| `body_part_detail` | string | - | 詳細筋（`大胸筋中部` 等）。任意の補足 |
 | `secondary` | string | - | 補助筋（`肩（前）, 腕（三頭筋）` 等） |
 | `default_routine` | string | ✅ | `火` / `木` / `土`（複数可、カンマ区切り） |
-| `pr_weight` | number | ✅ | ベスト重量（kg） |
+| `bodyweight` | bool | - | 自重種目なら `true`（`pr_weight=0` と併用） |
+| `pr_weight` | number | ✅ | ベスト重量（kg）。自重種目は `0` |
 | `pr_reps` | number | ✅ | その時の回数 |
 | `pr_date` | date | ✅ | PR達成日 |
 | `notes` | string | - | フォーム注意点等 |
 | `created` | date | ✅ | JST |
+| `updated` | date | ✅ | 最終更新日（JST） |
 | `tags` | list | ✅ | `[training-exercise, health, ...]` |
+
+### 正規部位タクソノミ（body_part）
+
+Bases の「部位別」グルーピングを機能させるため、`body_part` は以下6値に統一する。細かい筋肉名は `body_part_detail` に書く。
+
+| body_part | 含む種目例 |
+|---|---|
+| `胸` | ダンベルプレス / ディップス |
+| `背中` | ベントオーバーロー / 懸垂 |
+| `肩` | ショルダープレス / ライイングリアレイズ |
+| `脚` | ブルガリアンスクワット / カーフレイズ / ルーマニアンデッドリフト |
+| `腕` | （二頭・三頭の単関節種目を追加する場合） |
+| `体幹` | プランク |
 
 ## 本文フォーマット（セッション）
 
@@ -79,6 +96,18 @@ tags: [health, training-log, readme, meta]
 「今日の筋トレ」「今日のメニュー」等の発話で、Claude が [[daily-schedule]] のルールに従って曜日別メニュー（休養日は未刺激種目）を提示する。
 
 ### 当日記録
+
+入力方法は2通り。どちらで記録しても保存先・スキーマは同じ。
+
+**A. フォーム入力（日本語フォーム式 / 推奨）**
+
+1. `templates/session-<routine>.md`（前回値プリフィル済み）を新規ノートとして複製
+2. 上部のフォーム欄（Meta Bind）で体調・気分・状態をタップ選択
+3. 各種目の重量×回数を数値だけ上書き → `sessions/YYYY-MM-DD_<routine>.md` で保存
+
+導入手順は [[templates/_フォーム入力ガイド]] を参照（必要プラグイン: Meta Bind / Templater）。
+
+**B. 対話入力（Claude）**
 
 1. 筋トレ実施後、Claude に「今日の筋トレ報告」と話しかける
 2. Claude が `_template-session.md` をベースに種目別ヒアリング

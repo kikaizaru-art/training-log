@@ -1,11 +1,14 @@
 ---
 type: training-exercise
 exercise_name: ダンベルプレス
-body_part: 胸（中）
+body_part: 胸
+body_part_detail: 大胸筋中部
 secondary: 肩（前）, 腕（三頭筋）
 default_routine: 火
+bodyweight: false
 notes: ""
 created: YYYY-MM-DD
+updated: YYYY-MM-DD
 tags: [training-exercise, health]
 pr_weight: 0
 pr_reps: 0

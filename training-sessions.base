@@ -1,7 +1,7 @@
 filters:
   and:
     - 'type == "training-session"'
-    - file.inFolder("20-Areas/health/training-log/sessions")
+    - file.inFolder("sessions")
     - 'file.basename != "_template-session"'
     - 'file.basename != "README"'
 

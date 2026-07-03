@@ -65,7 +65,11 @@ button.ghost{
   border-radius:10px; padding:7px 12px; font-size:13px; font-weight:600; cursor:pointer;
 }
 button.ghost.danger{color:var(--pr)}
+button.ghost.on{background:var(--accent); border-color:var(--accent); color:#fff}
 button:active{opacity:.75}
+button:disabled{opacity:.35; pointer-events:none}
+.color-dot{width:30px; height:30px; border-radius:50%; border:3px solid var(--card); cursor:pointer; flex:none; padding:0; box-shadow:var(--shadow)}
+.color-dot.on{outline:2px solid var(--text)}
 /* menu list */
 .menu-item{display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line)}
 .menu-item:last-child{border-bottom:none}
@@ -187,6 +191,9 @@ a.link{color:var(--accent); text-decoration:none; font-weight:600; font-size:13p
    Training Log — 筋トレMEMO風 個人トレーニング記録・予定アプリ
    データは localStorage 保存。初回起動時に Vault 由来のシードを投入。
    ========================================================= */
+
+/* アプリバージョン（更新時に上げる。設定画面に表示） */
+const APP_VERSION = "2026-07-03.1";
 
 /* ---------- 部位マスタ ---------- */
 const BODY_PARTS = {
@@ -470,6 +477,7 @@ const ui = {
   calYm:(()=>{const t=new Date(); return [t.getFullYear(),t.getMonth()];})(),
   calSel:todayStr(),
   editor:null,       // 記録編集中の一時セッション
+  rtEditor:null,     // ルーティン編集中の一時コピー
   chartEx:null,
 };
 
@@ -523,7 +531,8 @@ function viewHome(){
     todayCard = `
       <div class="card">
         <h2>今日 ${shortDate(today)}（${WD[dow]}）
-          <span class="chip" style="background:${routine.color}22;color:${routine.color}">${esc(routine.name)}</span></h2>
+          <span class="chip" style="background:${routine.color}22;color:${routine.color}">${esc(routine.name)}</span>
+          <a class="link" style="float:right" onclick="openRoutineForm('${routine.id}')">メニュー編集</a></h2>
         <div class="muted" style="margin-bottom:6px">${esc(routine.desc)}</div>
         ${routine.items.map(it=>{
           const bp = bpOf(it.ex); const last = lastPerf(it.ex);
@@ -1272,6 +1281,9 @@ function openScheduleEditor(){
     <div class="muted small" style="margin-top:12px">
       ${db.routines.map(r=>`<div>・${esc(r.name)}: ${esc(r.desc)}</div>`).join("")}
     </div>
+    <div style="margin-top:12px">
+      <button class="ghost" style="width:100%" onclick="openRoutineList()">ルーティンの中身を編集</button>
+    </div>
   `);
 }
 function setScheduleDay(d, v){
@@ -1280,6 +1292,157 @@ function setScheduleDay(d, v){
   ui._keepScroll=true; render();      // 背後のホーム/カレンダー表示を更新
   openScheduleEditor();               // モーダル内の色ドット等も更新
   toast(`${WD[d]}曜: ${v ? esc(db.routines.find(r=>r.id===v)?.name||"") : "休養"} に設定しました`);
+}
+
+/* ---------- ルーティン編集 ---------- */
+const RT_COLORS = ["#e5484d","#3e79f7","#f59e0b","#a855f7","#2fa96e","#d4a017","#14b8a6","#6b7280"];
+
+function openRoutineList(){
+  openModal(`
+    <div class="closebar"><h3>ルーティン管理</h3><button class="ghost" onclick="closeModal()">閉じる</button></div>
+    <div class="muted small" style="margin-bottom:10px">
+      各ルーティンの種目構成・セット/回数/重量の目安を調整できます。曜日の割当は「週間スケジュール」で行います。
+    </div>
+    ${db.routines.length?db.routines.map(r=>`
+      <div class="menu-item" style="cursor:pointer" onclick="openRoutineForm('${r.id}')">
+        <div class="bp-bar" style="background:${r.color}"></div>
+        <div class="grow">
+          <div class="name">${esc(r.name)}</div>
+          <div class="spec">${esc(r.desc)}${r.desc?"<br>":""}${r.items.length}種目: ${r.items.map(it=>esc(it.ex)).join("、")}</div>
+        </div>
+        <a class="link">編集</a>
+      </div>`).join(""):'<div class="empty">ルーティンがありません</div>'}
+    <div style="margin-top:12px">
+      <button class="ghost" style="width:100%" onclick="openRoutineForm(null)">＋ 新しいルーティンを作成</button>
+    </div>
+  `);
+}
+
+function openRoutineForm(id){
+  ui.rtEditor = id
+    ? JSON.parse(JSON.stringify(db.routines.find(x=>x.id===id)))
+    : {id:null, name:"", color:RT_COLORS[1], desc:"", items:[]};
+  renderRoutineForm();
+}
+function renderRoutineForm(){
+  const r=ui.rtEditor;
+  openModal(`
+    <div class="closebar"><h3>${r.id?"ルーティンを編集":"新しいルーティン"}</h3>
+      <button class="ghost" onclick="ui.rtEditor=null;closeModal()">閉じる</button></div>
+    <div class="field"><label>ルーティン名</label>
+      <input type="text" value="${esc(r.name)}" placeholder="例: 上半身push" oninput="ui.rtEditor.name=this.value"></div>
+    <div class="field"><label>説明</label>
+      <input type="text" value="${esc(r.desc)}" placeholder="例: 押す系メイン + 引く系1種目" oninput="ui.rtEditor.desc=this.value"></div>
+    <div class="field"><label>カラー</label>
+      <div class="row">${RT_COLORS.map(c=>`
+        <button class="color-dot ${r.color===c?"on":""}" style="background:${c}" onclick="ui.rtEditor.color='${c}';renderRoutineForm()"></button>`).join("")}</div></div>
+    <div class="field"><label>種目（${r.items.length}）</label>
+      ${r.items.length?r.items.map((it,i)=>rtItemHtml(it,i)).join(""):'<div class="empty">まだ種目がありません</div>'}
+      <button class="ghost" style="width:100%; margin-top:4px" onclick="openRtExPicker()">＋ 種目を追加</button></div>
+    <button class="primary" onclick="saveRoutine()">保存する</button>
+    ${r.id?`<div style="margin-top:8px">
+      <button class="ghost danger" style="width:100%" onclick="deleteRoutine('${r.id}')">このルーティンを削除</button></div>`:""}
+  `);
+}
+function rtItemHtml(it, i){
+  const bp=bpOf(it.ex), bw=isBw(it.ex);
+  const n=ui.rtEditor.items.length;
+  return `<div class="ex-block" style="border-left:4px solid ${bp?bp.hex:"#888"}; margin-top:8px">
+    <div class="ex-head">
+      <div class="name grow">${esc(it.ex)}</div>
+      <button class="ghost" ${i===0?"disabled":""} onclick="rtItemMove(${i},-1)">↑</button>
+      <button class="ghost" ${i===n-1?"disabled":""} onclick="rtItemMove(${i},1)">↓</button>
+      <button class="ghost danger" onclick="rtItemDel(${i})">削除</button>
+    </div>
+    <div class="set-row">
+      <input type="number" step="1" min="1" inputmode="numeric" value="${it.sets||""}" placeholder="3"
+        oninput="ui.rtEditor.items[${i}].sets=parseInt(this.value)||0">
+      <span class="unit" style="width:44px">セット</span>
+      <input type="number" step="1" min="0" inputmode="numeric" value="${it.reps||""}" placeholder="10"
+        oninput="ui.rtEditor.items[${i}].reps=parseInt(this.value)||0">
+      <span class="unit">回</span>
+      ${bw?'<span class="bwlabel">自重</span>':`
+      <input type="number" step="0.5" min="0" inputmode="decimal" value="${it.weight||""}" placeholder="kg"
+        oninput="ui.rtEditor.items[${i}].weight=parseFloat(this.value)||0">
+      <span class="unit">kg</span>`}
+    </div>
+    <div class="row" style="margin-top:6px">
+      <button class="ghost ${it.skip?"on":""}" onclick="rtItemSkipToggle(${i})">skip可</button>
+      <span class="muted small grow">skip可の種目は「このメニューで記録」時に展開されません（有酸素枠など）</span>
+    </div>
+  </div>`;
+}
+function rtItemMove(i, dir){
+  const items=ui.rtEditor.items, j=i+dir;
+  if(j<0 || j>=items.length) return;
+  [items[i],items[j]]=[items[j],items[i]];
+  renderRoutineForm();
+}
+function rtItemDel(i){ ui.rtEditor.items.splice(i,1); renderRoutineForm(); }
+function rtItemSkipToggle(i){
+  const it=ui.rtEditor.items[i];
+  it.skip=!it.skip;
+  renderRoutineForm();
+}
+function openRtExPicker(){
+  const inUse=new Set(ui.rtEditor.items.map(it=>it.ex));
+  const groups={};
+  for(const e of db.exercises) (groups[e.bp]=groups[e.bp]||[]).push(e);
+  openModal(`
+    <div class="closebar"><h3>ルーティンに種目を追加</h3><button class="ghost" onclick="renderRoutineForm()">戻る</button></div>
+    ${Object.entries(groups).map(([bp,list])=>`
+      <div class="bp-group">
+        <div class="bp-title"><span class="dot" style="background:${BODY_PARTS[bp].hex}"></span>${BODY_PARTS[bp].label}</div>
+        ${list.map(e=>`<div class="ex-row" onclick="rtPickExercise('${e.id}')">
+          <div class="grow">${esc(e.name)}${inUse.has(e.name)?' <span class="chip">追加済</span>':""}</div>
+        </div>`).join("")}
+      </div>`).join("")}
+    <div class="muted small">新しい種目の作成は「種目」タブから行えます。</div>
+  `);
+}
+function rtPickExercise(id){
+  const e=db.exercises.find(x=>x.id===id);
+  if(ui.rtEditor.items.some(it=>it.ex===e.name)){ toast("追加済みです"); return; }
+  const last=lastPerf(e.name);
+  ui.rtEditor.items.push({
+    ex:e.name,
+    sets:last?last.sets.length:3,
+    reps:last?Math.max(...last.sets.map(s=>s[1])):10,
+    weight:e.bw?0:(last?Math.max(...last.sets.map(s=>s[0])):0),
+    skip:false,
+  });
+  renderRoutineForm();
+  toast(`${e.name} を追加しました`);
+}
+function saveRoutine(){
+  const r=ui.rtEditor;
+  r.name=(r.name||"").trim();
+  if(!r.name){ toast("ルーティン名を入力してください"); return; }
+  if(db.routines.some(x=>x.name===r.name && x.id!==r.id)){ toast("同名のルーティンがあります"); return; }
+  if(!r.items.length){ toast("種目を1つ以上追加してください"); return; }
+  for(const it of r.items) if(!it.sets || it.sets<1) it.sets=1;
+  if(r.id){
+    const i=db.routines.findIndex(x=>x.id===r.id);
+    const oldName=db.routines[i].name;
+    db.routines[i]=r;
+    if(oldName!==r.name){ /* セッション履歴の参照も追随（種目リネームと同方針） */
+      for(const s of db.sessions) if(s.routine===oldName) s.routine=r.name;
+      if(ui.editor && ui.editor.routine===oldName) ui.editor.routine=r.name;
+    }
+  } else {
+    r.id=newId();
+    db.routines.push(r);
+  }
+  saveDb(); ui.rtEditor=null; closeModal(); render();
+  toast("ルーティンを保存しました");
+}
+function deleteRoutine(id){
+  const r=db.routines.find(x=>x.id===id);
+  if(!confirm(`「${r.name}」を削除しますか？\n※ 過去のセッション記録は残ります。週間スケジュールの割当は「休養」になります`)) return;
+  db.routines=db.routines.filter(x=>x.id!==id);
+  db.schedule=db.schedule.map(x=>x===id?null:x);
+  saveDb(); ui.rtEditor=null; render(); openRoutineList();
+  toast("削除しました");
 }
 
 /* ---------- 設定 ---------- */
@@ -1292,15 +1455,40 @@ function openSettings(){
       <div class="stat"><div class="v">${db.routines.length}</div><div class="k">ルーティン</div></div>
     </div>
     <div class="field"><button class="ghost" style="width:100%" onclick="closeModal();openScheduleEditor()">週間スケジュールを編集</button></div>
+    <div class="field"><button class="ghost" style="width:100%" onclick="openRoutineList()">ルーティンを編集</button></div>
     <div class="field"><button class="primary" onclick="exportJson()">JSONバックアップを保存</button></div>
     <div class="field"><label>バックアップから復元（JSON）</label>
       <input type="file" accept=".json" onchange="importJson(this.files[0])"></div>
     <div class="field" style="margin-top:20px">
+      <button class="ghost" style="width:100%" onclick="hardReload()">アプリを最新版に更新（キャッシュ再読込）</button>
+      <div class="muted small" style="margin-top:5px">
+        古い画面が表示され続ける場合に使用します。キャッシュのみ削除し、記録データ（localStorage）はそのまま残ります。
+      </div></div>
+    <div class="field">
       <button class="ghost danger" style="width:100%" onclick="resetSeed()">初期データ（Vaultシード）にリセット</button></div>
     <div class="muted small" style="margin-top:12px">
-      データはこの端末のブラウザ（localStorage）に保存されます。機種変更・ブラウザ変更前にJSONバックアップを取ってください。
+      データはこの端末のブラウザ（localStorage）に保存されます。機種変更・ブラウザ変更前にJSONバックアップを取ってください。<br>
+      アプリバージョン: ${APP_VERSION}
     </div>
   `);
+}
+/* キャッシュリロード: HTTPキャッシュ/Cache API/Service Worker を破棄して最新版を再取得。
+   localStorage（記録データ）には触れない */
+async function hardReload(){
+  toast("最新版を取得しています…", 4000);
+  try{
+    if(window.caches){
+      const keys=await caches.keys();
+      await Promise.all(keys.map(k=>caches.delete(k)));
+    }
+    if(navigator.serviceWorker){
+      const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r=>r.unregister()));
+    }
+  }catch(e){ console.warn("cache clear failed", e); }
+  const url=new URL(location.href);
+  url.searchParams.set("v", Date.now());   // キャッシュバスター
+  location.replace(url.toString());
 }
 function exportJson(){
   const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});

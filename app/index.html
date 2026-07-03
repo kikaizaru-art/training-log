@@ -740,10 +740,10 @@ function viewRec(){
     </div>
     <div class="card">
       <div class="field"><label>セッションメモ</label>
-        <textarea onchange="edSet('note',this.value)">${esc(ed.note)}</textarea></div>
+        <textarea onchange="ui.editor.note=this.value">${esc(ed.note)}</textarea></div>
       <div class="row" style="margin-bottom:10px">
         <div class="grow muted">総ボリューム（自重除く）</div>
-        <div class="big">${fmtKg(vol)}<span class="small"> kg</span></div>
+        <div class="big"><span id="total-vol">${fmtKg(vol)}</span><span class="small"> kg</span></div>
       </div>
       <button class="primary" onclick="saveSession()">💾 保存する</button>
       ${ed.id?"":`<div style="margin-top:8px"><button class="ghost" style="width:100%" onclick="cancelEdit()">キャンセル</button></div>`}
@@ -755,16 +755,9 @@ function exBlockHtml(e, ei){
   const bp=bpOf(e.name);
   const last=lastPerf(e.name, ui.editor.id?ui.editor.date:null) || lastPerf(e.name);
   const pr=prOf(e.name, ui.editor.date);
-  /* ライブPR判定 */
-  let hitsPr=false;
-  for(const [w,r] of e.sets){
-    if(r<=0) continue;
-    if(!pr){ hitsPr=true; break; }
-    if(bw ? r>pr.reps : (w>pr.weight||(w===pr.weight&&r>pr.reps))){ hitsPr=true; break; }
-  }
   return `<div class="card ex-block" style="border-left:4px solid ${bp?bp.hex:"#888"}">
     <div class="ex-head">
-      <div class="name grow">${esc(e.name)} ${hitsPr?'<span class="chip pr">PR!</span>':""}</div>
+      <div class="name grow">${esc(e.name)} <span id="prchip-${ei}">${entryHitsPr(e)?'<span class="chip pr">PR!</span>':""}</span></div>
       <button class="ghost" onclick="copyPrev(${ei})">前回コピー</button>
       <button class="ghost danger" onclick="removeEntry(${ei})">削除</button>
     </div>
@@ -774,16 +767,16 @@ function exBlockHtml(e, ei){
         <span class="setno">セット${si+1}</span>
         ${bw?`<span class="bwlabel">自重</span>`:
           `<input type="number" step="0.5" min="0" inputmode="decimal" value="${s[0]||""}" placeholder="kg"
-            onchange="setVal(${ei},${si},0,this.value)">`}
+            oninput="setVal(${ei},${si},0,this.value)">`}
         <span class="unit">${bw?"":"kg"}</span>
         <input type="number" step="1" min="0" inputmode="numeric" value="${s[1]||""}" placeholder="回"
-          onchange="setVal(${ei},${si},1,this.value)">
+          oninput="setVal(${ei},${si},1,this.value)">
         <span class="unit">回</span>
         <button class="del" onclick="removeSet(${ei},${si})">✕</button>
       </div>`).join("")}
     <div class="row" style="margin-top:6px">
       <button class="ghost" onclick="addSet(${ei})">＋ セット追加</button>
-      <div class="grow ex-vol">${bw?"自重（ボリューム計算外）":`小計 ${fmtKg(entryVolume(e))}kg`}</div>
+      <div class="grow ex-vol" id="exvol-${ei}">${bw?"自重（ボリューム計算外）":`小計 ${fmtKg(entryVolume(e))}kg`}</div>
     </div>
     <div style="margin-top:8px">
       <input type="text" placeholder="種目メモ（フォーム・所感など）" value="${esc(e.memo)}"
@@ -804,7 +797,27 @@ function edRoutine(name){
   }
   ui._keepScroll=true; render();
 }
-function setVal(ei,si,idx,v){ ui.editor.entries[ei].sets[si][idx]=parseFloat(v)||0; ui._keepScroll=true; render(); }
+function entryHitsPr(e){
+  const bw=isBw(e.name);
+  const pr=prOf(e.name, ui.editor.date);
+  for(const [w,r] of e.sets){
+    if(r<=0) continue;
+    if(!pr) return true;
+    if(bw ? r>pr.reps : (w>pr.weight||(w===pr.weight&&r>pr.reps))) return true;
+  }
+  return false;
+}
+/* 全体再描画するとblur時にタップ先のボタンが差し替わってクリックが消えるため、影響箇所のみ更新 */
+function setVal(ei,si,idx,v){
+  const e=ui.editor.entries[ei];
+  e.sets[si][idx]=parseFloat(v)||0;
+  const vol=document.getElementById(`exvol-${ei}`);
+  if(vol && !isBw(e.name)) vol.textContent=`小計 ${fmtKg(entryVolume(e))}kg`;
+  const total=document.getElementById("total-vol");
+  if(total) total.textContent=fmtKg(ui.editor.entries.reduce((a,x)=>a+entryVolume(x),0));
+  const chip=document.getElementById(`prchip-${ei}`);
+  if(chip) chip.innerHTML=entryHitsPr(e)?'<span class="chip pr">PR!</span>':"";
+}
 function addSet(ei){
   const sets=ui.editor.entries[ei].sets;
   sets.push(sets.length?[...sets[sets.length-1]]:[0,10]);

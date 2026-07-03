@@ -38,7 +38,9 @@ header.topbar .date{font-size:12.5px; color:var(--sub)}
 .iconbtn{
   border:none; background:var(--card); color:var(--text); box-shadow:var(--shadow);
   width:36px; height:36px; border-radius:10px; font-size:17px; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center;
 }
+.iconbtn svg{width:19px; height:19px}
 .card{background:var(--card); border-radius:14px; box-shadow:var(--shadow); padding:14px 16px; margin-bottom:12px}
 .card h2{font-size:13px; color:var(--sub); font-weight:600; letter-spacing:.04em; margin-bottom:8px}
 .card h2 .chip{float:right}
@@ -139,7 +141,8 @@ nav.tabbar button{
   flex:1; max-width:100px; border:none; background:none; color:var(--sub); cursor:pointer;
   font-size:10.5px; display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 0;
 }
-nav.tabbar button .ico{font-size:20px; line-height:1}
+nav.tabbar button .ico{line-height:1}
+nav.tabbar button .ico svg{width:21px; height:21px; display:block}
 nav.tabbar button.on{color:var(--accent); font-weight:700}
 /* modal */
 .modal-wrap{position:fixed; inset:0; z-index:50; background:rgba(10,14,22,.5); display:flex; align-items:flex-end; justify-content:center}
@@ -196,6 +199,19 @@ const BODY_PARTS = {
   cardio:   {label:"有酸素", color:"var(--cardio)",    hex:"#14b8a6"},
 };
 const WD = ["日","月","火","水","木","金","土"];
+
+/* ---------- SVGアイコン（絵文字不使用） ---------- */
+const svgIcon = p =>
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const ICONS = {
+  home:     svgIcon('<path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/>'),
+  cal:      svgIcon('<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>'),
+  plus:     svgIcon('<path d="M12 5v14M5 12h14"/>'),
+  dumbbell: svgIcon('<path d="M2.5 12h2M19.5 12h2M7.5 12h9"/><rect x="4.5" y="7.5" width="3" height="9" rx="1"/><rect x="16.5" y="7.5" width="3" height="9" rx="1"/>'),
+  chart:    svgIcon('<path d="M3.5 4v16h17"/><path d="M7 15.5l3.5-4.5 3 2.5 4.5-6"/>'),
+  gear:     svgIcon('<circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1.03H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.09a1.7 1.7 0 0 0 1.03-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.09a1.7 1.7 0 0 0 1.55 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1.03Z"/>'),
+  trash:    svgIcon('<path d="M3.5 6.5h17M8.5 6.5V4.5a1.5 1.5 0 0 1 1.5-1.5h4a1.5 1.5 0 0 1 1.5 1.5v2m3 0V19a2 2 0 0 1-2 2H7.5a2 2 0 0 1-2-2V6.5"/>'),
+};
 
 /* ---------- シードデータ（Vault: routines.md / exercises/ / sessions/ 由来） ---------- */
 const SEED_EXERCISES = [
@@ -255,17 +271,17 @@ const SEED_SESSIONS = [
     _E("ベントオーバーロー",_R3(36,10)), _E("ライイングリアレイズ",_R3(6,10)),
   ],{cond:3,mood:3,note:"主要4種目すべて停滞継続。マイクロロード未着手"}),
   _S("2026-05-07","脚＋体幹","partial",[
-    _E("ブルガリアンスクワット",_R3(44,11),"🎉 PR更新 +1rep"),
+    _E("ブルガリアンスクワット",_R3(44,11),"PR更新 +1rep"),
     _E("カーフレイズ",_R3(28,15)), _E("プランク",_R3(0,60)),
   ],{cond:3,mood:3,note:"ブルガリアンでマイクロロード成功（停滞脱却の最初のサンプル）"}),
   _S("2026-05-09","Pull＋仕上げ","completed",[
     _E("ルーマニアンデッドリフト",_R3(64,10)), _E("懸垂",[[0,6]]),
-    _E("ネガティヴ懸垂",[[0,10]]), _E("ベントオーバーロー",_R3(36,11),"🎉 PR更新 +1rep"),
+    _E("ネガティヴ懸垂",[[0,10]]), _E("ベントオーバーロー",_R3(36,11),"PR更新 +1rep"),
     _E("ディップス",_R3(0,10)), _E("ライイングリアレイズ",_R3(6,10)),
   ]),
   _S("2026-05-12","上半身push","completed",[
-    _E("ダンベルプレス",_R3(36,11),"🎉 PR更新 +1rep"),
-    _E("ショルダープレス",_R3(28,11),"🎉 PR更新 +1rep"),
+    _E("ダンベルプレス",_R3(36,11),"PR更新 +1rep"),
+    _E("ショルダープレス",_R3(28,11),"PR更新 +1rep"),
     _E("ベントオーバーロー",_R3(36,11)), _E("ライイングリアレイズ",_R3(6,10)),
   ],{note:"push 3種目すべて11回達成。+1repマイクロロードが波及"}),
   _S("2026-05-14","脚＋体幹","partial",[
@@ -282,8 +298,8 @@ const SEED_SESSIONS = [
     _E("カーフレイズ",_R3(28,15)), _E("プランク",_R3(0,60)),
   ]),
   _S("2026-05-23","Pull＋仕上げ","completed",[
-    _E("ルーマニアンデッドリフト",_R3(64,11),"🎉 PR更新 +1rep"),
-    _E("ベントオーバーロー",_R3(36,11)), _E("ディップス",_R3(0,11),"🎉 +1rep PR"),
+    _E("ルーマニアンデッドリフト",_R3(64,11),"PR更新 +1rep"),
+    _E("ベントオーバーロー",_R3(36,11)), _E("ディップス",_R3(0,11),"+1rep PR"),
   ],{note:"懸垂系・リアレイズは翌日キャッチアップ"}),
   _S("2026-05-24","Pull＋仕上げ","completed",[
     _E("懸垂",[[0,6]]), _E("ゴム補助懸垂",[[0,10]]),
@@ -295,7 +311,7 @@ const SEED_SESSIONS = [
   ],{note:"主要3種目PRタイ維持。達成水準の定着フェーズ"}),
   _S("2026-05-28","脚＋体幹","partial",[
     _E("ブルガリアンスクワット",_R3(44,11)),
-    _E("カーフレイズ",_R3(32,16),"🎉 二重PR更新 +4kg/+1rep"),
+    _E("カーフレイズ",_R3(32,16),"二重PR更新 +4kg/+1rep"),
     _E("プランク",_R3(0,60)),
   ]),
   _S("2026-05-30","Pull＋仕上げ","completed",[
@@ -325,7 +341,7 @@ const SEED_SESSIONS = [
   ],{note:"6/9 の繰越キャッチアップ"}),
   _S("2026-06-13","Pull＋仕上げ","completed",[
     _E("ルーマニアンデッドリフト",_R3(64,11)),
-    _E("懸垂",[[0,7]],"🎉 自重repPR更新 6→7回。目標10回まで残り+3"),
+    _E("懸垂",[[0,7]],"自重repPR更新 6→7回。目標10回まで残り+3"),
     _E("ネガティヴ懸垂",[[0,10]]), _E("ベントオーバーロー",_R3(36,11)),
     _E("ディップス",_R3(0,11)), _E("ライイングリアレイズ",_R3(6,10)),
   ]),
@@ -335,19 +351,35 @@ const SEED_SESSIONS = [
 const DB_KEY = "training-log-app-v1";
 let db = null;
 function newId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+/* routine.day（シード/旧データ）からスケジュール配列を構築 */
+function scheduleFromRoutines(routines){
+  const sc = Array(7).fill(null);
+  for(const r of routines) if(r.day!=null && sc[r.day]==null) sc[r.day]=r.id;
+  return sc;
+}
 function seedDb(){
   let i = 0;
+  const routines = SEED_ROUTINES.map(r=>({id:"rt"+(++i), ...r}));
   return {
     version: 1,
     exercises: SEED_EXERCISES.map(e=>({id:"ex"+(++i), ...e})),
-    routines:  SEED_ROUTINES.map(r=>({id:"rt"+(++i), ...r})),
+    routines,
     sessions:  SEED_SESSIONS.map(s=>({id:"ss"+(++i), ...s})),
+    schedule:  scheduleFromRoutines(routines),
   };
 }
 function loadDb(){
   try{
     const raw = localStorage.getItem(DB_KEY);
-    if(raw){ db = JSON.parse(raw); return; }
+    if(raw){
+      db = JSON.parse(raw);
+      /* 旧データ移行: routine.day から週間スケジュールを構築 */
+      if(!Array.isArray(db.schedule) || db.schedule.length!==7){
+        db.schedule = scheduleFromRoutines(db.routines);
+        saveDb();
+      }
+      return;
+    }
   }catch(e){ console.warn("load failed", e); }
   db = seedDb();
   saveDb();
@@ -365,6 +397,11 @@ const fmtKg = v => (Math.round(v*10)/10).toLocaleString();
 
 function exByName(name){ return db.exercises.find(e=>e.name===name); }
 function routineByName(name){ return db.routines.find(r=>r.name===name); }
+/* 週間スケジュール（0=日〜6=土 → routine または null=休養） */
+function routineOnDay(dow){
+  const id = db.schedule ? db.schedule[dow] : null;
+  return id ? db.routines.find(r=>r.id===id) || null : null;
+}
 function bpOf(name){ const e=exByName(name); return e ? BODY_PARTS[e.bp] : null; }
 function isBw(name){ const e=exByName(name); return e ? !!e.bw : false; }
 
@@ -440,11 +477,11 @@ const ui = {
 const $app = document.getElementById("app");
 const $tabbar = document.getElementById("tabbar");
 const TABS = [
-  {id:"home",  ico:"🏠", label:"ホーム"},
-  {id:"cal",   ico:"📅", label:"カレンダー"},
-  {id:"rec",   ico:"➕", label:"記録"},
-  {id:"ex",    ico:"💪", label:"種目"},
-  {id:"chart", ico:"📈", label:"グラフ"},
+  {id:"home",  ico:ICONS.home,     label:"ホーム"},
+  {id:"cal",   ico:ICONS.cal,      label:"カレンダー"},
+  {id:"rec",   ico:ICONS.plus,     label:"記録"},
+  {id:"ex",    ico:ICONS.dumbbell, label:"種目"},
+  {id:"chart", ico:ICONS.chart,    label:"グラフ"},
 ];
 function render(){
   $tabbar.innerHTML = TABS.map(t=>
@@ -471,7 +508,7 @@ function toast(msg, ms){
 function viewHome(){
   const today = todayStr();
   const dow = new Date().getDay();
-  const routine = db.routines.find(r=>r.day===dow);
+  const routine = routineOnDay(dow);
   const recordedToday = db.sessions.filter(s=>s.date===today);
 
   let todayCard;
@@ -497,11 +534,11 @@ function viewHome(){
               <div class="name">${esc(it.ex)} ${it.skip?'<span class="chip">skip可</span>':""}</div>
               <div class="spec">目安 ${it.sets}セット × ${it.reps||"-"}回${it.weight?` @ ${fmtKg(it.weight)}kg`:""}
                 ${last?`<br>前回 ${shortDate(last.date)}: ${setsSummary(last.sets, isBw(it.ex))}`:""}
-                ${hint?`<br><span style="color:var(--warn)">▲ ${hint}</span>`:""}</div>
+                ${hint?`<br><span style="color:var(--warn)">${hint}</span>`:""}</div>
             </div></div>`;
         }).join("")}
         <div style="margin-top:12px">
-          <button class="primary" onclick="startFromRoutine('${routine.id}','${today}')">▶ このメニューで記録を始める</button>
+          <button class="primary" onclick="startFromRoutine('${routine.id}','${today}')">このメニューで記録を始める</button>
         </div>
       </div>`;
   } else {
@@ -522,12 +559,12 @@ function viewHome(){
   /* 週間予定ストリップ */
   const strip = Array.from({length:7},(_,i)=>{
     const d=new Date(monday); d.setDate(monday.getDate()+i);
-    const ds=fmtDate(d); const rt=db.routines.find(r=>r.day===d.getDay());
+    const ds=fmtDate(d); const rt=routineOnDay(d.getDay());
     const done=db.sessions.some(s=>s.date===ds);
     return `<div class="wd ${ds===today?"today":""}">
       <span class="lbl">${WD[d.getDay()]}</span>
       <span class="rt" style="color:${rt?rt.color:"var(--sub)"}">${rt?esc(rt.name):"休養"}</span>
-      <span>${done?"✅":d.getDay()===0||rt?"":""}${!done&&rt&&ds<today?"—":""}</span>
+      <span>${done?'<span style="color:var(--ok);font-weight:700">✓</span>':(rt&&ds<today?"—":"")}</span>
     </div>`;
   }).join("");
 
@@ -549,11 +586,11 @@ function viewHome(){
   return `
     <header class="topbar">
       <div><h1>Training Log</h1><div class="date">${today}（${WD[dow]}）</div></div>
-      <button class="iconbtn" onclick="openSettings()">⚙️</button>
+      <button class="iconbtn" onclick="openSettings()">${ICONS.gear}</button>
     </header>
     ${todayCard}
     <div class="card">
-      <h2>今週（月〜日）</h2>
+      <h2>今週（月〜日）<a class="link" style="float:right" onclick="openScheduleEditor()">スケジュール編集</a></h2>
       <div class="stat-grid">
         <div class="stat"><div class="v">${wkSessions.length}</div><div class="k">セッション</div></div>
         <div class="stat"><div class="v">${fmtKg(wkVol)}</div><div class="k">総ボリューム kg</div></div>
@@ -562,7 +599,7 @@ function viewHome(){
       <div class="week-strip">${strip}</div>
     </div>
     <div class="card">
-      <h2>最近のPR 🎉</h2>
+      <h2>最近のPR</h2>
       ${recentPrs.length?recentPrs.map(p=>`
         <div class="menu-item">
           <div class="bp-bar" style="background:${bpOf(p.name)?.hex||"#888"}"></div>
@@ -581,7 +618,10 @@ function restDayCardHtml(today, dow){
   for(const r of db.routines) for(const it of r.items) if(!it.skip) all.add(it.ex);
   const untouched = [...all].filter(n=>!trained.has(n));
   const nextDayOf = name => {
-    for(const r of db.routines) if(r.items.some(it=>it.ex===name && !it.skip)) return WD[r.day];
+    for(let d=0; d<7; d++){
+      const r=routineOnDay(d);
+      if(r && r.items.some(it=>it.ex===name && !it.skip)) return WD[d];
+    }
     return "-";
   };
   return `
@@ -636,7 +676,7 @@ function viewCal(){
     const bps=new Set();
     for(const s of ss) for(const e of s.entries){const b=exByName(e.name); if(b) bps.add(b.bp);}
     const dots=[...bps].slice(0,4).map(b=>`<span class="dot" style="background:${BODY_PARTS[b].hex}"></span>`).join("");
-    const rt = !c.out && !ss.length && c.date>=today ? db.routines.find(r=>r.day===parseDate(c.date).getDay()) : null;
+    const rt = !c.out && !ss.length && c.date>=today ? routineOnDay(parseDate(c.date).getDay()) : null;
     return `<div class="cal-cell ${c.out?"out":""} ${c.date===today?"today":""} ${c.date===ui.calSel?"sel":""}"
       onclick="selCalDay('${c.date}')">
       <span class="dnum">${c.d}</span>
@@ -646,10 +686,10 @@ function viewCal(){
   }).join("");
 
   const selSessions=byDate[ui.calSel]||[];
-  const selRt=db.routines.find(r=>r.day===parseDate(ui.calSel).getDay());
+  const selRt=routineOnDay(parseDate(ui.calSel).getDay());
   return `
     <header class="topbar"><div><h1>カレンダー</h1></div>
-      <button class="iconbtn" onclick="openSettings()">⚙️</button></header>
+      <button class="iconbtn" onclick="openSettings()">${ICONS.gear}</button></header>
     <div class="card">
       <div class="cal-head">
         <button class="ghost" onclick="calMove(-1)">‹ 前月</button>
@@ -668,7 +708,7 @@ function viewCal(){
       <h2>${ui.calSel}（${wdOf(ui.calSel)}）${selRt?`<span class="chip" style="background:${selRt.color}22;color:${selRt.color}">${esc(selRt.name)}の日</span>`:""}</h2>
       ${selSessions.length?selSessions.map(sessionSummaryHtml).join(""):'<div class="empty">記録なし</div>'}
       <div style="margin-top:10px" class="row">
-        ${selRt?`<button class="ghost" onclick="startFromRoutine('${selRt.id}','${ui.calSel}')">▶ ${esc(selRt.name)}で記録</button>`:""}
+        ${selRt?`<button class="ghost" onclick="startFromRoutine('${selRt.id}','${ui.calSel}')">${esc(selRt.name)}で記録</button>`:""}
         <button class="ghost" onclick="startNewRecord('${ui.calSel}');switchTab('rec')">＋ 自由に記録</button>
       </div>
     </div>`;
@@ -710,7 +750,7 @@ function viewRec(){
   return `
     <header class="topbar">
       <div><h1>${ed.id?"記録を編集":"記録をつける"}</h1><div class="date">${ed.date}（${wdOf(ed.date)}）</div></div>
-      ${ed.id?`<button class="iconbtn" onclick="deleteSession('${ed.id}')">🗑️</button>`:""}
+      ${ed.id?`<button class="iconbtn" onclick="deleteSession('${ed.id}')">${ICONS.trash}</button>`:""}
     </header>
     <div class="card">
       <div class="field"><label>日付</label>
@@ -745,7 +785,7 @@ function viewRec(){
         <div class="grow muted">総ボリューム（自重除く）</div>
         <div class="big"><span id="total-vol">${fmtKg(vol)}</span><span class="small"> kg</span></div>
       </div>
-      <button class="primary" onclick="saveSession()">💾 保存する</button>
+      <button class="primary" onclick="saveSession()">保存する</button>
       ${ed.id?"":`<div style="margin-top:8px"><button class="ghost" style="width:100%" onclick="cancelEdit()">キャンセル</button></div>`}
     </div>`;
 }
@@ -872,7 +912,7 @@ function saveSession(){
   }
   saveDb();
   ui.editor=null; ui.tab="home"; render();
-  toast(prHits.length?`🎉 PR更新! ${prHits.join(" / ")}`:"保存しました", prHits.length?3500:2000);
+  toast(prHits.length?`PR更新! ${prHits.join(" / ")}`:"保存しました", prHits.length?3500:2000);
 }
 
 /* 種目ピッカー */
@@ -937,8 +977,8 @@ function openExerciseDetail(id){
     </div>
     ${pr?`<div class="muted small" style="margin-bottom:10px">PR達成日: ${pr.date}</div>`:""}
     <div class="row" style="margin-bottom:12px">
-      <button class="ghost" onclick="closeModal();openExerciseForm('${e.id}')">✏️ 編集</button>
-      <button class="ghost" onclick="closeModal();chartOf('${e.id}')">📈 グラフ</button>
+      <button class="ghost" onclick="closeModal();openExerciseForm('${e.id}')">編集</button>
+      <button class="ghost" onclick="closeModal();chartOf('${e.id}')">グラフ</button>
       <button class="ghost danger" onclick="deleteExercise('${e.id}')">削除</button>
     </div>
     <h3 class="small" style="color:var(--sub)">履歴</h3>
@@ -1021,7 +1061,7 @@ function viewChart(){
 
   return `
     <header class="topbar"><div><h1>グラフ</h1></div>
-      <button class="iconbtn" onclick="openSettings()">⚙️</button></header>
+      <button class="iconbtn" onclick="openSettings()">${ICONS.gear}</button></header>
     <div class="card">
       <h2>種目別推移</h2>
       <div class="field">
@@ -1174,8 +1214,8 @@ function openSessionDetail(id){
     </div>
     ${s.note?`<div class="muted small" style="margin-top:6px">${esc(s.note)}</div>`:""}
     <div class="row" style="margin-top:14px">
-      <button class="ghost" onclick="closeModal();editSession('${s.id}')">✏️ 編集</button>
-      <button class="ghost" onclick="copySessionMd('${s.id}')">📋 Markdownコピー（Vault形式）</button>
+      <button class="ghost" onclick="closeModal();editSession('${s.id}')">編集</button>
+      <button class="ghost" onclick="copySessionMd('${s.id}')">Markdownコピー（Vault形式）</button>
     </div>
   `);
 }
@@ -1210,6 +1250,38 @@ function copySessionMd(id){
     .catch(()=>{ prompt("コピーしてください", md); });
 }
 
+/* ---------- 週間スケジュール ---------- */
+function openScheduleEditor(){
+  const order=[1,2,3,4,5,6,0]; // 月曜始まり（今週サマリと同じ並び）
+  openModal(`
+    <div class="closebar"><h3>週間スケジュール</h3><button class="ghost" onclick="closeModal()">閉じる</button></div>
+    <div class="muted small" style="margin-bottom:12px">
+      曜日ごとに実施するルーティンを設定します。変更はすぐに保存され、ホームの「今日のメニュー」・週間予定・カレンダーの予定表示に反映されます。
+    </div>
+    ${order.map(d=>{
+      const rt=routineOnDay(d);
+      return `<div class="lt-row">
+        <span style="width:32px; font-weight:700">${WD[d]}</span>
+        <span class="dot" style="background:${rt?rt.color:"var(--line)"}"></span>
+        <select style="flex:1" onchange="setScheduleDay(${d}, this.value)">
+          <option value="" ${!db.schedule[d]?"selected":""}>休養</option>
+          ${db.routines.map(r=>`<option value="${r.id}" ${db.schedule[d]===r.id?"selected":""}>${esc(r.name)}</option>`).join("")}
+        </select>
+      </div>`;
+    }).join("")}
+    <div class="muted small" style="margin-top:12px">
+      ${db.routines.map(r=>`<div>・${esc(r.name)}: ${esc(r.desc)}</div>`).join("")}
+    </div>
+  `);
+}
+function setScheduleDay(d, v){
+  db.schedule[d] = v || null;
+  saveDb();
+  ui._keepScroll=true; render();      // 背後のホーム/カレンダー表示を更新
+  openScheduleEditor();               // モーダル内の色ドット等も更新
+  toast(`${WD[d]}曜: ${v ? esc(db.routines.find(r=>r.id===v)?.name||"") : "休養"} に設定しました`);
+}
+
 /* ---------- 設定 ---------- */
 function openSettings(){
   openModal(`
@@ -1219,7 +1291,8 @@ function openSettings(){
       <div class="stat"><div class="v">${db.exercises.length}</div><div class="k">種目</div></div>
       <div class="stat"><div class="v">${db.routines.length}</div><div class="k">ルーティン</div></div>
     </div>
-    <div class="field"><button class="primary" onclick="exportJson()">⬇ JSONバックアップを保存</button></div>
+    <div class="field"><button class="ghost" style="width:100%" onclick="closeModal();openScheduleEditor()">週間スケジュールを編集</button></div>
+    <div class="field"><button class="primary" onclick="exportJson()">JSONバックアップを保存</button></div>
     <div class="field"><label>バックアップから復元（JSON）</label>
       <input type="file" accept=".json" onchange="importJson(this.files[0])"></div>
     <div class="field" style="margin-top:20px">

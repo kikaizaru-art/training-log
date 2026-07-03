@@ -15,8 +15,8 @@ tags: [health, training-log, app, readme]
 
 いずれかの方法で `app/index.html` を開くだけ。
 
+- **GitHub Pages（公開中）**: <https://kikaizaru-art.github.io/training-log/app/>
 - **ローカル**: ファイルをブラウザで直接開く（`file://` で動作する）
-- **GitHub Pages**: リポジトリ設定で Pages を有効化すれば `https://<user>.github.io/training-log/app/` で開ける
 - **スマホ**: 上記URLを開いて「ホーム画面に追加」するとアプリ風に使える
 
 ### 初期データ

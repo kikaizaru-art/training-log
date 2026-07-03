@@ -7,6 +7,8 @@ tags: [health, training-log, readme, meta]
 
 # Training Log 使い方
 
+> **📱 アプリ版**: 筋トレMEMO風の記録・予定Webアプリを [`app/index.html`](app/index.html) に追加（2026-07-03）。単一HTMLファイル・依存ゼロで、Vault由来のルーティン/種目/セッション19件をシード内蔵。詳細は [app/README.md](app/README.md)。
+
 ## 命名規則
 
 ### セッション記録

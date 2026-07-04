@@ -193,7 +193,7 @@ a.link{color:var(--accent); text-decoration:none; font-weight:600; font-size:13p
    ========================================================= */
 
 /* アプリバージョン（更新時に上げる。設定画面に表示） */
-const APP_VERSION = "2026-07-03.1";
+const APP_VERSION = "2026-07-04.1";
 
 /* ---------- 部位マスタ ---------- */
 const BODY_PARTS = {
@@ -271,16 +271,16 @@ const SEED_ROUTINES = [
 const _R3 = (w,r)=>[[w,r],[w,r],[w,r]];
 const _E  = (name,sets,memo)=>({name, sets, memo:memo||""});
 const _S  = (date,routine,status,entries,o)=>Object.assign(
-  {date, routine, status, cond:null, mood:null, note:"", entries}, o||{});
+  {date, routine, status, note:"", entries}, o||{});
 const SEED_SESSIONS = [
   _S("2026-05-05","上半身push","completed",[
     _E("ダンベルプレス",_R3(36,10)), _E("ショルダープレス",_R3(28,10)),
     _E("ベントオーバーロー",_R3(36,10)), _E("ライイングリアレイズ",_R3(6,10)),
-  ],{cond:3,mood:3,note:"主要4種目すべて停滞継続。マイクロロード未着手"}),
+  ],{note:"主要4種目すべて停滞継続。マイクロロード未着手"}),
   _S("2026-05-07","脚＋体幹","partial",[
     _E("ブルガリアンスクワット",_R3(44,11),"PR更新 +1rep"),
     _E("カーフレイズ",_R3(28,15)), _E("プランク",_R3(0,60)),
-  ],{cond:3,mood:3,note:"ブルガリアンでマイクロロード成功（停滞脱却の最初のサンプル）"}),
+  ],{note:"ブルガリアンでマイクロロード成功（停滞脱却の最初のサンプル）"}),
   _S("2026-05-09","Pull＋仕上げ","completed",[
     _E("ルーマニアンデッドリフト",_R3(64,10)), _E("懸垂",[[0,6]]),
     _E("ネガティヴ懸垂",[[0,10]]), _E("ベントオーバーロー",_R3(36,11),"PR更新 +1rep"),
@@ -454,23 +454,6 @@ function setsSummary(sets, bw){
   }
   return groups.map(g=>`${bw||g.w<=0?"自重":fmtKg(g.w)+"kg"}×${g.r}${g.n>1?"×"+g.n:""}`).join(", ");
 }
-/* 同一トップ実績の連続回数（ブレイクスルー提案用） */
-function plateauStreak(name){
-  const hist = exerciseHistory(name);
-  if(hist.length<2) return 0;
-  const key = h => JSON.stringify(h.sets);
-  const last = key(hist[hist.length-1]);
-  let n=0;
-  for(let i=hist.length-1;i>=0;i--){ if(key(hist[i])===last) n++; else break; }
-  return n;
-}
-function nextActionHint(name){
-  const streak = plateauStreak(name);
-  if(streak>=3) return `同条件 ${streak}回連続 → +1rep か +2.5kg のブレイクスルー試行時期`;
-  if(streak===2) return "2回連続維持 → 次回マイクロロード検討";
-  return null;
-}
-
 /* ---------- UI 状態 ---------- */
 const ui = {
   tab:"home",
@@ -536,14 +519,12 @@ function viewHome(){
         <div class="muted" style="margin-bottom:6px">${esc(routine.desc)}</div>
         ${routine.items.map(it=>{
           const bp = bpOf(it.ex); const last = lastPerf(it.ex);
-          const hint = it.skip ? null : nextActionHint(it.ex);
           return `<div class="menu-item">
             <div class="bp-bar" style="background:${bp?bp.hex:"#888"}"></div>
             <div class="grow">
               <div class="name">${esc(it.ex)} ${it.skip?'<span class="chip">skip可</span>':""}</div>
               <div class="spec">目安 ${it.sets}セット × ${it.reps||"-"}回${it.weight?` @ ${fmtKg(it.weight)}kg`:""}
-                ${last?`<br>前回 ${shortDate(last.date)}: ${setsSummary(last.sets, isBw(it.ex))}`:""}
-                ${hint?`<br><span style="color:var(--warn)">${hint}</span>`:""}</div>
+                ${last?`<br>前回 ${shortDate(last.date)}: ${setsSummary(last.sets, isBw(it.ex))}`:""}</div>
             </div></div>`;
         }).join("")}
         <div style="margin-top:12px">
@@ -654,7 +635,6 @@ function sessionSummaryHtml(s){
   const vol=sessionVolume(s);
   return `<div class="session-sum">
     <div class="row"><b>${esc(s.routine||"自由記録")}</b>
-      <span class="chip" style="margin-left:4px">${s.status==="partial"?"一部実施":s.status==="skipped"?"スキップ":"完了"}</span>
       <span class="grow"></span>
       <a class="link" onclick="editSession('${s.id}')">編集</a>
       <a class="link" onclick="openSessionDetail('${s.id}')">詳細</a></div>
@@ -731,7 +711,7 @@ function selCalDay(date){ ui.calSel=date; ui._keepScroll=true; render(); }
 
 /* ---------- 記録エディタ ---------- */
 function startNewRecord(date){
-  ui.editor={id:null, date, routine:"", status:"completed", cond:null, mood:null, note:"", entries:[]};
+  ui.editor={id:null, date, routine:"", status:"completed", note:"", entries:[]};
 }
 function startFromRoutine(rtId, date){
   const rt=db.routines.find(r=>r.id===rtId);
@@ -769,17 +749,6 @@ function viewRec(){
           <option value="" ${!ed.routine?"selected":""}>（自由記録）</option>
           ${db.routines.map(r=>`<option ${ed.routine===r.name?"selected":""}>${esc(r.name)}</option>`).join("")}
         </select></div>
-      <div class="field"><label>ステータス</label>
-        <div class="seg">
-          ${[["completed","完了"],["partial","一部実施"],["skipped","スキップ"]].map(([v,l])=>
-            `<button class="${ed.status===v?"on":""}" onclick="edSet('status','${v}')">${l}</button>`).join("")}
-        </div></div>
-      <div class="row">
-        <div class="field grow"><label>体調</label><div class="seg">
-          ${[1,2,3,4,5].map(n=>`<button class="${ed.cond===n?"on":""}" onclick="edSet('cond',${ed.cond===n?"null":n})">${n}</button>`).join("")}</div></div>
-        <div class="field grow"><label>気分</label><div class="seg">
-          ${[1,2,3,4,5].map(n=>`<button class="${ed.mood===n?"on":""}" onclick="edSet('mood',${ed.mood===n?"null":n})">${n}</button>`).join("")}</div></div>
-      </div>
     </div>
 
     ${ed.entries.map((e,ei)=>exBlockHtml(e,ei)).join("")}
@@ -893,7 +862,7 @@ function deleteSession(id){
 function saveSession(){
   const ed=ui.editor;
   ed.entries=ed.entries.filter(e=>e.sets.some(([w,r])=>r>0));
-  if(!ed.entries.length && ed.status!=="skipped"){ toast("セットが入力されていません"); return; }
+  if(!ed.entries.length){ toast("セットが入力されていません"); return; }
   /* PR判定（保存前の履歴と比較） */
   const prHits=[];
   for(const e of ed.entries){
@@ -1219,7 +1188,7 @@ function openSessionDetail(id){
         ${e.memo?`<br><span class="muted small">${esc(e.memo)}</span>`:""}</span>
         <span class="muted">${isBw(e.name)?"—":fmtKg(entryVolume(e))+"kg"}</span></div>`).join("")}
     <div class="row" style="margin:12px 0 0">
-      <div class="grow muted">総ボリューム ${fmtKg(sessionVolume(s))}kg ${s.cond?`・体調${s.cond}`:""} ${s.mood?`・気分${s.mood}`:""}</div>
+      <div class="grow muted">総ボリューム ${fmtKg(sessionVolume(s))}kg</div>
     </div>
     ${s.note?`<div class="muted small" style="margin-top:6px">${esc(s.note)}</div>`:""}
     <div class="row" style="margin-top:14px">
@@ -1233,8 +1202,7 @@ function sessionToMd(s){
   const lines=[
     "---","type: training-session","project: health-training",
     `date: ${s.date}`,`weekday: ${wdOf(s.date)}`,`routine: ${s.routine||"自由記録"}`,
-    `condition: ${s.cond??"null"}`,`mood: ${s.mood??"null"}`,
-    `total_volume_kg: ${Math.round(vol)}`,`status: ${s.status}`,
+    `total_volume_kg: ${Math.round(vol)}`,`status: ${s.status||"completed"}`,
     `created: ${s.date}`,`tags: [training-session, health, ${s.routine||"自由記録"}]`,"---","",
     `# 筋トレ記録 ${s.date} (${wdOf(s.date)}) - ${s.routine||"自由記録"}`,"",
     "## 種目別記録",""];

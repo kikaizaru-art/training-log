@@ -119,6 +119,12 @@ input[type=date], select, textarea, input[type=text]{
   width:100%; padding:10px; border:1px solid var(--line); border-radius:10px;
   background:var(--bg); color:var(--text); font-size:15px; font-family:inherit;
 }
+/* iOS Safariはネイティブ外観のdate inputが親幅(width:100%)を無視してはみ出すため外観を無効化 */
+input[type=date]{
+  -webkit-appearance:none; appearance:none;
+  display:block; min-width:0; max-width:100%; min-height:44px;
+}
+input[type=date]::-webkit-date-and-time-value{text-align:left}
 textarea{resize:vertical; min-height:60px}
 .field{margin-bottom:12px}
 .field label{display:block; font-size:12px; color:var(--sub); font-weight:600; margin-bottom:5px}

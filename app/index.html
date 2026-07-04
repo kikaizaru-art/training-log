@@ -206,7 +206,7 @@ a.link{color:var(--accent); text-decoration:none; font-weight:600; font-size:13p
    ========================================================= */
 
 /* アプリバージョン（更新時に上げる。設定画面に表示） */
-const APP_VERSION = "2026-07-04.1";
+const APP_VERSION = "2026-07-04.2";
 
 /* ---------- 部位マスタ ---------- */
 const BODY_PARTS = {
@@ -535,7 +535,7 @@ function viewHome(){
           return `<div class="menu-item">
             <div class="bp-bar" style="background:${bp?bp.hex:"#888"}"></div>
             <div class="grow">
-              <div class="name">${esc(it.ex)} ${it.skip?'<span class="chip">skip可</span>':""}</div>
+              <div class="name">${esc(it.ex)}${it.alts&&it.alts.length?` <span class="muted small">or ${it.alts.map(esc).join(" or ")}</span>`:""} ${it.skip?'<span class="chip">skip可</span>':""}</div>
               <div class="spec">目安 ${it.sets}セット × ${it.reps||"-"}回${it.weight?` @ ${fmtKg(it.weight)}kg`:""}
                 ${last?`<br>前回 ${shortDate(last.date)}: ${setsSummary(last.sets, isBw(it.ex))}`:""}</div>
             </div></div>`;
@@ -728,14 +728,62 @@ function startNewRecord(date){
 }
 function startFromRoutine(rtId, date){
   const rt=db.routines.find(r=>r.id===rtId);
+  if(routineHasOr(rt)){ ui.orChoice={}; openOrChooser(rtId, date, false); return; }
   startNewRecord(date);
   ui.editor.routine=rt.name;
-  ui.editor.entries=rt.items.filter(it=>!it.skip).map(it=>{
-    const last=lastPerf(it.ex);
-    const sets=last?last.sets.map(s=>[...s]):Array.from({length:it.sets},()=>[it.weight,it.reps]);
-    return {name:it.ex, sets, memo:""};
-  });
+  ui.editor.entries=entriesFromRoutine(rt, null);
   ui.tab="rec"; render();
+  toast("前回実績をプリセットしました");
+}
+
+/* ---------- or枠（どちらか選択） ---------- */
+function routineHasOr(rt){ return rt.items.some(it=>!it.skip && it.alts && it.alts.length); }
+/* choices: {itemIndex: 種目名}。or枠は選択された種目名でエントリを作る */
+function entriesFromRoutine(rt, choices){
+  const out=[];
+  rt.items.forEach((it,i)=>{
+    if(it.skip) return;
+    const name=(choices && choices[i]) || it.ex;
+    const last=lastPerf(name);
+    const sets=last?last.sets.map(s=>[...s]):Array.from({length:it.sets},()=>[isBw(name)?0:it.weight,it.reps]);
+    out.push({name, sets, memo:""});
+  });
+  return out;
+}
+function openOrChooser(rtId, date, append){
+  ui.orCtx={rtId, date, append:!!append};
+  ui.orChoice=ui.orChoice||{};
+  const rt=db.routines.find(r=>r.id===rtId);
+  openModal(`
+    <div class="closebar"><h3>${esc(rt.name)} — 種目を選択</h3>
+      <button class="ghost" onclick="cancelOrChooser()">閉じる</button></div>
+    <div class="muted small" style="margin-bottom:12px">or枠のある種目は、今日実施する方を選んでください。</div>
+    ${rt.items.map((it,i)=>{
+      if(it.skip || !(it.alts&&it.alts.length)) return "";
+      const cands=[it.ex, ...it.alts];
+      const cur=ui.orChoice[i]||it.ex;
+      const last=lastPerf(cur);
+      return `<div class="field">
+        <label>${cands.map(esc).join(" or ")}</label>
+        <div class="seg">${cands.map(c=>`<button class="${cur===c?"on":""}" data-name="${esc(c)}" onclick="orPick(${i}, this.dataset.name)">${esc(c)}</button>`).join("")}</div>
+        <div class="prev-hint">${esc(cur)}: ${last?`前回 ${shortDate(last.date)} ${setsSummary(last.sets, isBw(cur))}`:"初実施"}</div>
+      </div>`;
+    }).join("")}
+    <button class="primary" onclick="confirmOrStart()">この内容で記録を始める</button>
+  `);
+}
+function orPick(i, name){
+  ui.orChoice[i]=name;
+  openOrChooser(ui.orCtx.rtId, ui.orCtx.date, ui.orCtx.append);
+}
+function cancelOrChooser(){ ui.orCtx=null; ui.orChoice=null; closeModal(); }
+function confirmOrStart(){
+  const {rtId, date, append}=ui.orCtx;
+  const rt=db.routines.find(r=>r.id===rtId);
+  if(!append){ startNewRecord(date); ui.editor.routine=rt.name; }
+  ui.editor.entries=entriesFromRoutine(rt, ui.orChoice);
+  ui.orCtx=null; ui.orChoice=null;
+  closeModal(); ui.tab="rec"; render();
   toast("前回実績をプリセットしました");
 }
 function editSession(id){
@@ -821,10 +869,14 @@ function edRoutine(name){
   ui.editor.routine=name;
   if(name && !ui.editor.entries.length){
     const rt=routineByName(name);
-    if(rt) ui.editor.entries=rt.items.filter(it=>!it.skip).map(it=>{
-      const last=lastPerf(it.ex);
-      return {name:it.ex, sets:last?last.sets.map(s=>[...s]):Array.from({length:it.sets},()=>[it.weight,it.reps]), memo:""};
-    });
+    if(rt){
+      if(routineHasOr(rt)){
+        ui._keepScroll=true; render();
+        ui.orChoice={}; openOrChooser(rt.id, ui.editor.date, true);
+        return;
+      }
+      ui.editor.entries=entriesFromRoutine(rt, null);
+    }
   }
   ui._keepScroll=true; render();
 }
@@ -1018,7 +1070,10 @@ function saveExercise(id){
     Object.assign(e,{name,bp,bw:window._exfBw,note});
     if(oldName!==name){ /* セッション・ルーティン内の参照も追随 */
       for(const s of db.sessions) for(const en of s.entries) if(en.name===oldName) en.name=name;
-      for(const r of db.routines) for(const it of r.items) if(it.ex===oldName) it.ex=name;
+      for(const r of db.routines) for(const it of r.items){
+        if(it.ex===oldName) it.ex=name;
+        if(it.alts) it.alts=it.alts.map(a=>a===oldName?name:a);
+      }
     }
   } else {
     if(exByName(name)){ toast("同名の種目があります"); return; }
@@ -1289,7 +1344,7 @@ function openRoutineList(){
         <div class="bp-bar" style="background:${r.color}"></div>
         <div class="grow">
           <div class="name">${esc(r.name)}</div>
-          <div class="spec">${esc(r.desc)}${r.desc?"<br>":""}${r.items.length}種目: ${r.items.map(it=>esc(it.ex)).join("、")}</div>
+          <div class="spec">${esc(r.desc)}${r.desc?"<br>":""}${r.items.length}種目: ${r.items.map(it=>esc(it.ex)+(it.alts&&it.alts.length?" or "+it.alts.map(esc).join(" or "):"")).join("、")}</div>
         </div>
         <a class="link">編集</a>
       </div>`).join(""):'<div class="empty">ルーティンがありません</div>'}
@@ -1328,9 +1383,10 @@ function renderRoutineForm(){
 function rtItemHtml(it, i){
   const bp=bpOf(it.ex), bw=isBw(it.ex);
   const n=ui.rtEditor.items.length;
+  const alts=it.alts||[];
   return `<div class="ex-block" style="border-left:4px solid ${bp?bp.hex:"#888"}; margin-top:8px">
     <div class="ex-head">
-      <div class="name grow">${esc(it.ex)}</div>
+      <div class="name grow">${esc(it.ex)}${alts.length?` <span class="muted small">or ${alts.map(esc).join(" or ")}</span>`:""}</div>
       <button class="ghost" ${i===0?"disabled":""} onclick="rtItemMove(${i},-1)">↑</button>
       <button class="ghost" ${i===n-1?"disabled":""} onclick="rtItemMove(${i},1)">↓</button>
       <button class="ghost danger" onclick="rtItemDel(${i})">削除</button>
@@ -1351,8 +1407,14 @@ function rtItemHtml(it, i){
       <button class="ghost ${it.skip?"on":""}" onclick="rtItemSkipToggle(${i})">skip可</button>
       <span class="muted small grow">skip可の種目は「このメニューで記録」時に展開されません（有酸素枠など）</span>
     </div>
+    <div class="row" style="margin-top:6px; flex-wrap:wrap">
+      ${alts.map((a,ai)=>`<span class="chip">${esc(a)}<button style="border:none;background:none;color:inherit;cursor:pointer;padding:0 0 0 5px;font-size:11px" onclick="rtAltDel(${i},${ai})">✕</button></span>`).join("")}
+      <button class="ghost" onclick="openRtExPicker(${i})">＋ or候補</button>
+      <span class="muted small grow">or候補を設定すると、記録開始時にどちらか一方を選択できます</span>
+    </div>
   </div>`;
 }
+function rtAltDel(i, ai){ ui.rtEditor.items[i].alts.splice(ai,1); renderRoutineForm(); }
 function rtItemMove(i, dir){
   const items=ui.rtEditor.items, j=i+dir;
   if(j<0 || j>=items.length) return;
@@ -1365,12 +1427,16 @@ function rtItemSkipToggle(i){
   it.skip=!it.skip;
   renderRoutineForm();
 }
-function openRtExPicker(){
-  const inUse=new Set(ui.rtEditor.items.map(it=>it.ex));
+function openRtExPicker(altFor){
+  ui._rtAltFor = (altFor==null ? null : altFor);
+  const target = ui._rtAltFor!=null ? ui.rtEditor.items[ui._rtAltFor] : null;
+  const inUse = target
+    ? new Set([target.ex, ...(target.alts||[])])
+    : new Set(ui.rtEditor.items.map(it=>it.ex));
   const groups={};
   for(const e of db.exercises) (groups[e.bp]=groups[e.bp]||[]).push(e);
   openModal(`
-    <div class="closebar"><h3>ルーティンに種目を追加</h3><button class="ghost" onclick="renderRoutineForm()">戻る</button></div>
+    <div class="closebar"><h3>${target?`「${esc(target.ex)}」の or候補を追加`:"ルーティンに種目を追加"}</h3><button class="ghost" onclick="ui._rtAltFor=null;renderRoutineForm()">戻る</button></div>
     ${Object.entries(groups).map(([bp,list])=>`
       <div class="bp-group">
         <div class="bp-title"><span class="dot" style="background:${BODY_PARTS[bp].hex}"></span>${BODY_PARTS[bp].label}</div>
@@ -1383,6 +1449,17 @@ function openRtExPicker(){
 }
 function rtPickExercise(id){
   const e=db.exercises.find(x=>x.id===id);
+  if(ui._rtAltFor!=null){
+    const it=ui.rtEditor.items[ui._rtAltFor];
+    it.alts=it.alts||[];
+    if(it.ex===e.name || it.alts.includes(e.name)){ toast("この枠に追加済みです"); return; }
+    it.alts.push(e.name);
+    const primary=it.ex;
+    ui._rtAltFor=null;
+    renderRoutineForm();
+    toast(`${primary} の or候補に ${e.name} を追加しました`);
+    return;
+  }
   if(ui.rtEditor.items.some(it=>it.ex===e.name)){ toast("追加済みです"); return; }
   const last=lastPerf(e.name);
   ui.rtEditor.items.push({

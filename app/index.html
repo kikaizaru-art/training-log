@@ -4,7 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#1f2532">
+<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141822" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Training Log">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <title>Training Log — 筋トレ記録</title>
 <style>
 :root{
@@ -119,6 +126,12 @@ input[type=date], select, textarea, input[type=text]{
   width:100%; padding:10px; border:1px solid var(--line); border-radius:10px;
   background:var(--bg); color:var(--text); font-size:15px; font-family:inherit;
 }
+/* iOS Safariはネイティブ外観のdate inputが親幅(width:100%)を無視してはみ出すため外観を無効化 */
+input[type=date]{
+  -webkit-appearance:none; appearance:none;
+  display:block; min-width:0; max-width:100%; min-height:44px;
+}
+input[type=date]::-webkit-date-and-time-value{text-align:left}
 textarea{resize:vertical; min-height:60px}
 .field{margin-bottom:12px}
 .field label{display:block; font-size:12px; color:var(--sub); font-weight:600; margin-bottom:5px}
@@ -1501,6 +1514,11 @@ function chartOf(exId){
 loadDb();
 render();
 window.addEventListener("resize", ()=>{ if(ui.tab==="chart") drawCharts(); });
+
+/* ---------- PWA: Service Worker登録（file://直開きでは登録しない） ---------- */
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  window.addEventListener("load", ()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); });
+}
 </script>
 </body>
 </html>

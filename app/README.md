@@ -7,7 +7,7 @@ tags: [health, training-log, app, readme]
 
 # Training Log アプリ（筋トレMEMO風）
 
-`app/index.html` 単体で動く、トレーニング記録・予定管理の個人用Webアプリ。外部ライブラリ・サーバ不要（依存ゼロの単一HTMLファイル）で、データは端末のブラウザ（localStorage）に保存される。
+`app/index.html` 単体で動く、トレーニング記録・予定管理の個人用Webアプリ。外部ライブラリ・サーバ不要で、データは端末のブラウザ（localStorage）に保存される。PWA対応（`manifest.webmanifest` + `sw.js`）で、ホーム画面に追加すればネイティブアプリ同様のスタンドアロン表示・オフライン起動ができる。
 
 ## 使い方
 
@@ -17,7 +17,7 @@ tags: [health, training-log, app, readme]
 
 - **GitHub Pages（公開中）**: <https://kikaizaru-art.github.io/training-log/app/>
 - **ローカル**: ファイルをブラウザで直接開く（`file://` で動作する）
-- **スマホ**: 上記URLを開いて「ホーム画面に追加」するとアプリ風に使える
+- **スマホ**: 上記URLを開いて「ホーム画面に追加」すると、専用アイコン・全画面表示の本物のアプリとして起動できる（初回表示後はオフラインでも起動可能）
 
 ### 初期データ
 

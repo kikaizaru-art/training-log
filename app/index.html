@@ -206,7 +206,7 @@ a.link{color:var(--accent); text-decoration:none; font-weight:600; font-size:13p
    ========================================================= */
 
 /* アプリバージョン（更新時に上げる。設定画面に表示） */
-const APP_VERSION = "2026-07-04.2";
+const APP_VERSION = "2026-07-04.3";
 
 /* ---------- 部位マスタ ---------- */
 const BODY_PARTS = {
@@ -247,8 +247,8 @@ const SEED_EXERCISES = [
   {name:"ゴム補助懸垂",           bp:"back",      bw:true,  note:"別名: 補助あり懸垂"},
   {name:"ネガティヴ懸垂",         bp:"back",      bw:true,  note:"別名: ネガティブ懸垂"},
   {name:"ディップス",             bp:"chest",     bw:true,  note:"胸中・下部、フォーム重視"},
-  {name:"ケトルベル",             bp:"cardio",    bw:true,  note:"有酸素枠・skip許容"},
-  {name:"エアロバイク",           bp:"cardio",    bw:true,  note:"有酸素枠・skip許容"},
+  {name:"ケトルベル",             bp:"cardio",    bw:false, time:true, note:"有酸素枠・skip許容。時間（分）で記録"},
+  {name:"エアロバイク",           bp:"cardio",    bw:false, time:true, note:"有酸素枠・skip許容。時間（分）で記録"},
 ];
 
 const SEED_ROUTINES = [
@@ -388,16 +388,30 @@ function seedDb(){
     schedule:  scheduleFromRoutines(routines),
   };
 }
+/* 旧データ移行。変更があれば true を返す */
+function migrateDb(){
+  let changed = false;
+  /* routine.day から週間スケジュールを構築 */
+  if(!Array.isArray(db.schedule) || db.schedule.length!==7){
+    db.schedule = scheduleFromRoutines(db.routines);
+    changed = true;
+  }
+  /* 時間ベースフラグ導入: 既存の有酸素種目は時間（分）記録に移行 */
+  for(const e of db.exercises){
+    if(e.time==null){
+      e.time = e.bp==="cardio";
+      if(e.time) e.bw = false;
+      changed = true;
+    }
+  }
+  return changed;
+}
 function loadDb(){
   try{
     const raw = localStorage.getItem(DB_KEY);
     if(raw){
       db = JSON.parse(raw);
-      /* 旧データ移行: routine.day から週間スケジュールを構築 */
-      if(!Array.isArray(db.schedule) || db.schedule.length!==7){
-        db.schedule = scheduleFromRoutines(db.routines);
-        saveDb();
-      }
+      if(migrateDb()) saveDb();
       return;
     }
   }catch(e){ console.warn("load failed", e); }
@@ -424,9 +438,14 @@ function routineOnDay(dow){
 }
 function bpOf(name){ const e=exByName(name); return e ? BODY_PARTS[e.bp] : null; }
 function isBw(name){ const e=exByName(name); return e ? !!e.bw : false; }
+/* 時間ベース種目（有酸素など）。sets の r 値は「分」として扱う */
+function isTime(name){ const e=exByName(name); return e ? !!e.time : false; }
+/* 重量入力を持たない種目（自重 or 時間ベース） */
+function noWeight(name){ return isBw(name) || isTime(name); }
+function entryMinutes(entry){ return entry.sets.reduce((a,[,r])=>a+(r>0?r:0), 0); }
 
 function entryVolume(entry){
-  if(isBw(entry.name)) return 0;
+  if(noWeight(entry.name)) return 0;
   return entry.sets.reduce((a,[w,r])=>a + (w>0 ? w*r : 0), 0);
 }
 function sessionVolume(s){ return s.entries.reduce((a,e)=>a+entryVolume(e), 0); }
@@ -440,15 +459,15 @@ function exerciseHistory(name){
       if(e.name===name) out.push({date:s.date, sessionId:s.id, sets:e.sets, memo:e.memo});
   return out;
 }
-/* PR（履歴から動的算出）。bw種目は最大rep、加重は 重量優先→rep */
+/* PR（履歴から動的算出）。bw種目は最大rep、時間種目は最大分、加重は 重量優先→rep */
 function prOf(name, beforeDate){
   const hist = exerciseHistory(name).filter(h=>!beforeDate || h.date < beforeDate);
   let pr = null;
-  const bw = isBw(name);
+  const rOnly = noWeight(name);
   for(const h of hist) for(const [w,r] of h.sets){
     if(r<=0) continue;
     if(!pr){ pr={weight:w,reps:r,date:h.date}; continue; }
-    if(bw ? r>pr.reps : (w>pr.weight || (w===pr.weight && r>pr.reps)))
+    if(rOnly ? r>pr.reps : (w>pr.weight || (w===pr.weight && r>pr.reps)))
       pr={weight:w,reps:r,date:h.date};
   }
   return pr;
@@ -457,14 +476,16 @@ function lastPerf(name, beforeDate){
   const hist = exerciseHistory(name).filter(h=>!beforeDate || h.date < beforeDate);
   return hist.length ? hist[hist.length-1] : null;
 }
-function setsSummary(sets, bw){
+function setsSummary(sets, name){
   if(!sets.length) return "-";
+  const bw=isBw(name), time=isTime(name);
   const groups=[];
   for(const [w,r] of sets){
     const last = groups[groups.length-1];
     if(last && last.w===w && last.r===r) last.n++;
     else groups.push({w,r,n:1});
   }
+  if(time) return groups.map(g=>`${g.r}分${g.n>1?"×"+g.n:""}`).join(", ");
   return groups.map(g=>`${bw||g.w<=0?"自重":fmtKg(g.w)+"kg"}×${g.r}${g.n>1?"×"+g.n:""}`).join(", ");
 }
 /* ---------- UI 状態 ---------- */
@@ -536,8 +557,8 @@ function viewHome(){
             <div class="bp-bar" style="background:${bp?bp.hex:"#888"}"></div>
             <div class="grow">
               <div class="name">${esc(it.ex)}${it.alts&&it.alts.length?` <span class="muted small">or ${it.alts.map(esc).join(" or ")}</span>`:""} ${it.skip?'<span class="chip">skip可</span>':""}</div>
-              <div class="spec">目安 ${it.sets}セット × ${it.reps||"-"}回${it.weight?` @ ${fmtKg(it.weight)}kg`:""}
-                ${last?`<br>前回 ${shortDate(last.date)}: ${setsSummary(last.sets, isBw(it.ex))}`:""}</div>
+              <div class="spec">目安 ${it.sets}セット × ${it.reps||"-"}${isTime(it.ex)?"分":"回"}${it.weight?` @ ${fmtKg(it.weight)}kg`:""}
+                ${last?`<br>前回 ${shortDate(last.date)}: ${setsSummary(last.sets, it.ex)}`:""}</div>
             </div></div>`;
         }).join("")}
         <div style="margin-top:12px">
@@ -575,11 +596,11 @@ function viewHome(){
   const prs=[];
   for(const s of sessionsSorted()) for(const e of s.entries){
     const before=prOf(e.name, s.date);
-    const bw=isBw(e.name);
+    const bw=isBw(e.name), time=isTime(e.name), rOnly=bw||time;
     for(const [w,r] of e.sets){
       if(r<=0) continue;
-      if(!before || (bw ? r>before.reps : (w>before.weight||(w===before.weight&&r>before.reps)))){
-        prs.push({date:s.date, name:e.name, w, r, bw});
+      if(!before || (rOnly ? r>before.reps : (w>before.weight||(w===before.weight&&r>before.reps)))){
+        prs.push({date:s.date, name:e.name, w, r, bw, time});
         break;
       }
     }
@@ -607,7 +628,7 @@ function viewHome(){
         <div class="menu-item">
           <div class="bp-bar" style="background:${bpOf(p.name)?.hex||"#888"}"></div>
           <div class="grow"><div class="name">${esc(p.name)}</div>
-            <div class="spec">${p.bw?"自重":fmtKg(p.w)+"kg"} × ${p.r}回</div></div>
+            <div class="spec">${p.time?`${p.r}分`:`${p.bw?"自重":fmtKg(p.w)+"kg"} × ${p.r}回`}</div></div>
           <div class="muted">${shortDate(p.date)}</div>
         </div>`).join(""):'<div class="empty">まだPRがありません</div>'}
     </div>`;
@@ -651,7 +672,7 @@ function sessionSummaryHtml(s){
       <span class="grow"></span>
       <a class="link" onclick="editSession('${s.id}')">編集</a>
       <a class="link" onclick="openSessionDetail('${s.id}')">詳細</a></div>
-    <div class="muted">${s.entries.map(e=>`${esc(e.name)} ${setsSummary(e.sets,isBw(e.name))}`).join(" ／ ")}</div>
+    <div class="muted">${s.entries.map(e=>`${esc(e.name)} ${setsSummary(e.sets,e.name)}`).join(" ／ ")}</div>
     <div class="muted">総ボリューム ${fmtKg(vol)}kg${s.note?` ・ ${esc(s.note)}`:""}</div>
   </div>`;
 }
@@ -745,7 +766,7 @@ function entriesFromRoutine(rt, choices){
     if(it.skip) return;
     const name=(choices && choices[i]) || it.ex;
     const last=lastPerf(name);
-    const sets=last?last.sets.map(s=>[...s]):Array.from({length:it.sets},()=>[isBw(name)?0:it.weight,it.reps]);
+    const sets=last?last.sets.map(s=>[...s]):Array.from({length:it.sets},()=>[noWeight(name)?0:it.weight,it.reps]);
     out.push({name, sets, memo:""});
   });
   return out;
@@ -766,7 +787,7 @@ function openOrChooser(rtId, date, append){
       return `<div class="field">
         <label>${cands.map(esc).join(" or ")}</label>
         <div class="seg">${cands.map(c=>`<button class="${cur===c?"on":""}" data-name="${esc(c)}" onclick="orPick(${i}, this.dataset.name)">${esc(c)}</button>`).join("")}</div>
-        <div class="prev-hint">${esc(cur)}: ${last?`前回 ${shortDate(last.date)} ${setsSummary(last.sets, isBw(cur))}`:"初実施"}</div>
+        <div class="prev-hint">${esc(cur)}: ${last?`前回 ${shortDate(last.date)} ${setsSummary(last.sets, cur)}`:"初実施"}</div>
       </div>`;
     }).join("")}
     <button class="primary" onclick="confirmOrStart()">この内容で記録を始める</button>
@@ -830,7 +851,7 @@ function viewRec(){
 }
 
 function exBlockHtml(e, ei){
-  const bw=isBw(e.name);
+  const bw=isBw(e.name), time=isTime(e.name);
   const bp=bpOf(e.name);
   const last=lastPerf(e.name, ui.editor.id?ui.editor.date:null) || lastPerf(e.name);
   const pr=prOf(e.name, ui.editor.date);
@@ -840,22 +861,25 @@ function exBlockHtml(e, ei){
       <button class="ghost" onclick="copyPrev(${ei})">前回コピー</button>
       <button class="ghost danger" onclick="removeEntry(${ei})">削除</button>
     </div>
-    <div class="prev-hint">${last?`前回 ${shortDate(last.date)}: ${setsSummary(last.sets,bw)}`:"初実施"} ${pr?` ／ PR: ${bw?"自重":fmtKg(pr.weight)+"kg"}×${pr.reps}（${shortDate(pr.date)}）`:""}</div>
+    <div class="prev-hint">${last?`前回 ${shortDate(last.date)}: ${setsSummary(last.sets,e.name)}`:"初実施"} ${pr?` ／ PR: ${time?pr.reps+"分":(bw?"自重":fmtKg(pr.weight)+"kg")+"×"+pr.reps}（${shortDate(pr.date)}）`:""}</div>
     ${e.sets.map((s,si)=>`
       <div class="set-row">
         <span class="setno">セット${si+1}</span>
+        ${time?`<input type="number" step="1" min="0" inputmode="numeric" value="${s[1]||""}" placeholder="分"
+            oninput="setVal(${ei},${si},1,this.value)">
+        <span class="unit">分</span>`:`
         ${bw?`<span class="bwlabel">自重</span>`:
           `<input type="number" step="0.5" min="0" inputmode="decimal" value="${s[0]||""}" placeholder="kg"
             oninput="setVal(${ei},${si},0,this.value)">`}
         <span class="unit">${bw?"":"kg"}</span>
         <input type="number" step="1" min="0" inputmode="numeric" value="${s[1]||""}" placeholder="回"
           oninput="setVal(${ei},${si},1,this.value)">
-        <span class="unit">回</span>
+        <span class="unit">回</span>`}
         <button class="del" onclick="removeSet(${ei},${si})">✕</button>
       </div>`).join("")}
     <div class="row" style="margin-top:6px">
       <button class="ghost" onclick="addSet(${ei})">＋ セット追加</button>
-      <div class="grow ex-vol" id="exvol-${ei}">${bw?"自重（ボリューム計算外）":`小計 ${fmtKg(entryVolume(e))}kg`}</div>
+      <div class="grow ex-vol" id="exvol-${ei}">${time?`合計 ${entryMinutes(e)}分`:bw?"自重（ボリューム計算外）":`小計 ${fmtKg(entryVolume(e))}kg`}</div>
     </div>
     <div style="margin-top:8px">
       <input type="text" placeholder="種目メモ（フォーム・所感など）" value="${esc(e.memo)}"
@@ -881,12 +905,12 @@ function edRoutine(name){
   ui._keepScroll=true; render();
 }
 function entryHitsPr(e){
-  const bw=isBw(e.name);
+  const rOnly=noWeight(e.name);
   const pr=prOf(e.name, ui.editor.date);
   for(const [w,r] of e.sets){
     if(r<=0) continue;
     if(!pr) return true;
-    if(bw ? r>pr.reps : (w>pr.weight||(w===pr.weight&&r>pr.reps))) return true;
+    if(rOnly ? r>pr.reps : (w>pr.weight||(w===pr.weight&&r>pr.reps))) return true;
   }
   return false;
 }
@@ -895,7 +919,8 @@ function setVal(ei,si,idx,v){
   const e=ui.editor.entries[ei];
   e.sets[si][idx]=parseFloat(v)||0;
   const vol=document.getElementById(`exvol-${ei}`);
-  if(vol && !isBw(e.name)) vol.textContent=`小計 ${fmtKg(entryVolume(e))}kg`;
+  if(vol && isTime(e.name)) vol.textContent=`合計 ${entryMinutes(e)}分`;
+  else if(vol && !isBw(e.name)) vol.textContent=`小計 ${fmtKg(entryVolume(e))}kg`;
   const total=document.getElementById("total-vol");
   if(total) total.textContent=fmtKg(ui.editor.entries.reduce((a,x)=>a+entryVolume(x),0));
   const chip=document.getElementById(`prchip-${ei}`);
@@ -935,16 +960,16 @@ function saveSession(){
     const saved=db.sessions; db.sessions=others;
     const pr=prOf(e.name);
     db.sessions=saved;
-    const bw=isBw(e.name);
+    const bw=isBw(e.name), time=isTime(e.name), rOnly=bw||time;
     let best=null;
     for(const [w,r] of e.sets){
       if(r<=0) continue;
-      if(!best || (bw?r>best.r:(w>best.w||(w===best.w&&r>best.r)))) best={w,r};
+      if(!best || (rOnly?r>best.r:(w>best.w||(w===best.w&&r>best.r)))) best={w,r};
     }
-    if(best && (!pr || (bw?best.r>pr.reps:(best.w>pr.weight||(best.w===pr.weight&&best.r>pr.reps)))))
-      prHits.push(`${e.name} ${bw?"自重":fmtKg(best.w)+"kg"}×${best.r}`);
+    if(best && (!pr || (rOnly?best.r>pr.reps:(best.w>pr.weight||(best.w===pr.weight&&best.r>pr.reps)))))
+      prHits.push(`${e.name} ${time?best.r+"分":(bw?"自重":fmtKg(best.w)+"kg")+"×"+best.r}`);
     /* 未登録種目はマスタに自動追加 */
-    if(!exByName(e.name)) db.exercises.push({id:newId(), name:e.name, bp:"chest", bw:false, note:"自動追加（部位を設定してください）"});
+    if(!exByName(e.name)) db.exercises.push({id:newId(), name:e.name, bp:"chest", bw:false, time:false, note:"自動追加（部位を設定してください）"});
   }
   if(ed.id){
     const i=db.sessions.findIndex(s=>s.id===ed.id);
@@ -979,7 +1004,8 @@ function pickExercise(id){
   const name=db.exercises.find(x=>x.id===id).name;
   if(ui.editor.entries.some(e=>e.name===name)){ toast("追加済みです"); return; }
   const last=lastPerf(name);
-  ui.editor.entries.push({name, sets:last?last.sets.map(s=>[...s]):[[isBw(name)?0:10,10]], memo:""});
+  const defSet = isTime(name) ? [0,20] : [isBw(name)?0:10,10];
+  ui.editor.entries.push({name, sets:last?last.sets.map(s=>[...s]):[defSet], memo:""});
   closeModal(); ui._keepScroll=true; render();
 }
 
@@ -999,7 +1025,7 @@ function viewEx(){
             <div class="grow"><div>${esc(e.name)}</div>
               ${e.note?`<div class="muted small">${esc(e.note)}</div>`:""}</div>
             <div>
-              <div class="pr">${pr?(e.bw?"自重":fmtKg(pr.weight)+"kg")+"×"+pr.reps:"-"}</div>
+              <div class="pr">${pr?(e.time?pr.reps+"分":(e.bw?"自重":fmtKg(pr.weight)+"kg")+"×"+pr.reps):"-"}</div>
               <div class="last">${last?"前回 "+shortDate(last.date):"未実施"}</div>
             </div></div>`;
         }).join("")}
@@ -1014,8 +1040,11 @@ function openExerciseDetail(id){
     <div class="closebar"><h3><span class="dot" style="background:${BODY_PARTS[e.bp].hex}"></span> ${esc(e.name)}</h3>
       <button class="ghost" onclick="closeModal()">閉じる</button></div>
     <div class="stat-grid" style="margin-bottom:12px">
+      ${e.time?`
+      <div class="stat"><div class="v">${pr?pr.reps:"-"}</div><div class="k">PR時間 分</div></div>
+      <div class="stat"><div class="v">${hist.reduce((a,h)=>a+h.sets.reduce((x,s)=>x+(s[1]>0?s[1]:0),0),0)}</div><div class="k">合計 分</div></div>`:`
       <div class="stat"><div class="v">${pr?(e.bw?"自重":fmtKg(pr.weight)):"-"}</div><div class="k">${e.bw?"PR形態":"PR重量 kg"}</div></div>
-      <div class="stat"><div class="v">${pr?pr.reps:"-"}</div><div class="k">PRレップ</div></div>
+      <div class="stat"><div class="v">${pr?pr.reps:"-"}</div><div class="k">PRレップ</div></div>`}
       <div class="stat"><div class="v">${hist.length}</div><div class="k">実施回数</div></div>
     </div>
     ${pr?`<div class="muted small" style="margin-bottom:10px">PR達成日: ${pr.date}</div>`:""}
@@ -1027,14 +1056,15 @@ function openExerciseDetail(id){
     <h3 class="small" style="color:var(--sub)">履歴</h3>
     ${hist.length?hist.map(h=>`
       <div class="hist-row"><span class="d">${h.date}</span>
-        <span class="grow">${setsSummary(h.sets,e.bw)}${h.memo?`<br><span class="muted small">${esc(h.memo)}</span>`:""}</span>
-        <span class="muted">${e.bw?"":fmtKg(h.sets.reduce((a,[w,r])=>a+w*r,0))+"kg"}</span>
+        <span class="grow">${setsSummary(h.sets,e.name)}${h.memo?`<br><span class="muted small">${esc(h.memo)}</span>`:""}</span>
+        <span class="muted">${e.time?h.sets.reduce((a,[,r])=>a+(r>0?r:0),0)+"分":e.bw?"":fmtKg(h.sets.reduce((a,[w,r])=>a+w*r,0))+"kg"}</span>
       </div>`).join(""):'<div class="empty">履歴なし</div>'}
   `);
 }
 
 function openExerciseForm(id){
-  const e = id ? db.exercises.find(x=>x.id===id) : {id:null,name:"",bp:"chest",bw:false,note:""};
+  const e = id ? db.exercises.find(x=>x.id===id) : {id:null,name:"",bp:"chest",bw:false,time:false,note:""};
+  const type = e.time ? "time" : e.bw ? "bw" : "w";
   openModal(`
     <div class="closebar"><h3>${id?"種目を編集":"新しい種目"}</h3>
       <button class="ghost" onclick="closeModal()">閉じる</button></div>
@@ -1045,29 +1075,33 @@ function openExerciseForm(id){
         `<option value="${k}" ${e.bp===k?"selected":""}>${v.label}</option>`).join("")}</select></div>
     <div class="field"><label>タイプ</label>
       <div class="seg">
-        <button id="exf-bw0" class="${!e.bw?"on":""}" onclick="exfBw(false)">加重（kg入力）</button>
-        <button id="exf-bw1" class="${e.bw?"on":""}" onclick="exfBw(true)">自重</button>
-      </div></div>
+        <button id="exf-tw" class="${type==="w"?"on":""}" onclick="exfType('w')">加重（kg×回）</button>
+        <button id="exf-tbw" class="${type==="bw"?"on":""}" onclick="exfType('bw')">自重（回）</button>
+        <button id="exf-ttime" class="${type==="time"?"on":""}" onclick="exfType('time')">時間（分）</button>
+      </div>
+      <div class="muted small" style="margin-top:5px">時間（分）: エアロバイクなどの有酸素向け。回数ではなく実施時間で記録します</div></div>
     <div class="field"><label>メモ</label>
       <input type="text" id="exf-note" value="${esc(e.note)}"></div>
     <button class="primary" onclick="saveExercise(${id?`'${id}'`:"null"})">保存</button>
   `);
-  window._exfBw = e.bw;
+  window._exfType = type;
 }
-function exfBw(v){
-  window._exfBw=v;
-  document.getElementById("exf-bw0").classList.toggle("on",!v);
-  document.getElementById("exf-bw1").classList.toggle("on",v);
+function exfType(t){
+  window._exfType=t;
+  document.getElementById("exf-tw").classList.toggle("on",t==="w");
+  document.getElementById("exf-tbw").classList.toggle("on",t==="bw");
+  document.getElementById("exf-ttime").classList.toggle("on",t==="time");
 }
 function saveExercise(id){
   const name=document.getElementById("exf-name").value.trim();
   if(!name){ toast("種目名を入力してください"); return; }
   const bp=document.getElementById("exf-bp").value;
   const note=document.getElementById("exf-note").value;
+  const bw=window._exfType==="bw", time=window._exfType==="time";
   if(id){
     const e=db.exercises.find(x=>x.id===id);
     const oldName=e.name;
-    Object.assign(e,{name,bp,bw:window._exfBw,note});
+    Object.assign(e,{name,bp,bw,time,note});
     if(oldName!==name){ /* セッション・ルーティン内の参照も追随 */
       for(const s of db.sessions) for(const en of s.entries) if(en.name===oldName) en.name=name;
       for(const r of db.routines) for(const it of r.items){
@@ -1077,7 +1111,7 @@ function saveExercise(id){
     }
   } else {
     if(exByName(name)){ toast("同名の種目があります"); return; }
-    db.exercises.push({id:newId(), name, bp, bw:window._exfBw, note});
+    db.exercises.push({id:newId(), name, bp, bw, time, note});
   }
   saveDb(); closeModal(); render(); toast("保存しました");
 }
@@ -1138,11 +1172,16 @@ function viewChart(){
 function drawCharts(){
   const name=ui.chartEx;
   if(name){
-    const bw=isBw(name);
+    const bw=isBw(name), time=isTime(name);
     const hist=exerciseHistory(name);
     const l1=document.getElementById("chart1-label");
     const l2=document.getElementById("chart2-label");
-    if(bw){
+    if(time){
+      l1.textContent="最大時間の推移";
+      lineChart("chart1", hist.map(h=>({x:h.date, y:Math.max(...h.sets.map(s=>s[1]))})), "分");
+      l2.textContent="合計時間の推移";
+      lineChart("chart2", hist.map(h=>({x:h.date, y:h.sets.reduce((a,s)=>a+s[1],0)})), "分");
+    } else if(bw){
       l1.textContent="最大レップ数の推移";
       lineChart("chart1", hist.map(h=>({x:h.date, y:Math.max(...h.sets.map(s=>s[1]))})), "回");
       l2.textContent="総レップ数の推移";
@@ -1252,9 +1291,9 @@ function openSessionDetail(id){
       <button class="ghost" onclick="closeModal()">閉じる</button></div>
     ${s.entries.map(e=>`
       <div class="hist-row"><span class="grow"><b>${esc(e.name)}</b><br>
-        ${e.sets.map((st,i)=>`セット${i+1}: ${isBw(e.name)||st[0]<=0?"自重":fmtKg(st[0])+"kg"} × ${st[1]}回`).join("<br>")}
+        ${e.sets.map((st,i)=>isTime(e.name)?`セット${i+1}: ${st[1]}分`:`セット${i+1}: ${isBw(e.name)||st[0]<=0?"自重":fmtKg(st[0])+"kg"} × ${st[1]}回`).join("<br>")}
         ${e.memo?`<br><span class="muted small">${esc(e.memo)}</span>`:""}</span>
-        <span class="muted">${isBw(e.name)?"—":fmtKg(entryVolume(e))+"kg"}</span></div>`).join("")}
+        <span class="muted">${isTime(e.name)?entryMinutes(e)+"分":isBw(e.name)?"—":fmtKg(entryVolume(e))+"kg"}</span></div>`).join("")}
     <div class="row" style="margin:12px 0 0">
       <div class="grow muted">総ボリューム ${fmtKg(sessionVolume(s))}kg</div>
     </div>
@@ -1276,9 +1315,14 @@ function sessionToMd(s){
     "## 種目別記録",""];
   for(const e of s.entries){
     lines.push(`### ${e.name}`);
-    e.sets.forEach((st,i)=>lines.push(`- セット${i+1}: ${isBw(e.name)||st[0]<=0?"自重":st[0]+"kg"} × ${st[1]}回`));
-    const v=entryVolume(e);
-    lines.push(v>0?`- ボリューム: ${Math.round(v)}kg`:"- ボリューム: 自重のため計算外");
+    if(isTime(e.name)){
+      e.sets.forEach((st,i)=>lines.push(`- セット${i+1}: ${st[1]}分`));
+      lines.push(`- 合計時間: ${entryMinutes(e)}分`);
+    } else {
+      e.sets.forEach((st,i)=>lines.push(`- セット${i+1}: ${isBw(e.name)||st[0]<=0?"自重":st[0]+"kg"} × ${st[1]}回`));
+      const v=entryVolume(e);
+      lines.push(v>0?`- ボリューム: ${Math.round(v)}kg`:"- ボリューム: 自重のため計算外");
+    }
     if(e.memo) lines.push(`- メモ: ${e.memo}`);
     lines.push("");
   }
@@ -1381,7 +1425,7 @@ function renderRoutineForm(){
   `);
 }
 function rtItemHtml(it, i){
-  const bp=bpOf(it.ex), bw=isBw(it.ex);
+  const bp=bpOf(it.ex), bw=isBw(it.ex), time=isTime(it.ex);
   const n=ui.rtEditor.items.length;
   const alts=it.alts||[];
   return `<div class="ex-block" style="border-left:4px solid ${bp?bp.hex:"#888"}; margin-top:8px">
@@ -1395,10 +1439,10 @@ function rtItemHtml(it, i){
       <input type="number" step="1" min="1" inputmode="numeric" value="${it.sets||""}" placeholder="3"
         oninput="ui.rtEditor.items[${i}].sets=parseInt(this.value)||0">
       <span class="unit" style="width:44px">セット</span>
-      <input type="number" step="1" min="0" inputmode="numeric" value="${it.reps||""}" placeholder="10"
+      <input type="number" step="1" min="0" inputmode="numeric" value="${it.reps||""}" placeholder="${time?"20":"10"}"
         oninput="ui.rtEditor.items[${i}].reps=parseInt(this.value)||0">
-      <span class="unit">回</span>
-      ${bw?'<span class="bwlabel">自重</span>':`
+      <span class="unit">${time?"分":"回"}</span>
+      ${time?"":bw?'<span class="bwlabel">自重</span>':`
       <input type="number" step="0.5" min="0" inputmode="decimal" value="${it.weight||""}" placeholder="kg"
         oninput="ui.rtEditor.items[${i}].weight=parseFloat(this.value)||0">
       <span class="unit">kg</span>`}
@@ -1464,9 +1508,9 @@ function rtPickExercise(id){
   const last=lastPerf(e.name);
   ui.rtEditor.items.push({
     ex:e.name,
-    sets:last?last.sets.length:3,
-    reps:last?Math.max(...last.sets.map(s=>s[1])):10,
-    weight:e.bw?0:(last?Math.max(...last.sets.map(s=>s[0])):0),
+    sets:last?last.sets.length:(e.time?1:3),
+    reps:last?Math.max(...last.sets.map(s=>s[1])):(e.time?20:10),
+    weight:e.bw||e.time?0:(last?Math.max(...last.sets.map(s=>s[0])):0),
     skip:false,
   });
   renderRoutineForm();
@@ -1563,7 +1607,7 @@ function importJson(file){
     try{
       const data=JSON.parse(fr.result);
       if(!data.sessions||!data.exercises) throw new Error("形式不正");
-      db=data; saveDb(); closeModal(); render();
+      db=data; migrateDb(); saveDb(); closeModal(); render();
       toast("復元しました");
     }catch(e){ toast("読み込みに失敗しました: "+e.message, 3000); }
   };
